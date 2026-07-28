@@ -1,16 +1,8 @@
-# Compiled class file
+# ==========================================
+# 1. Java Executables & Class Files (File biên dịch)
+# ==========================================
 *.class
-
-# Log file
 *.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -19,6 +11,59 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# ==========================================
+# 2. Build Tools (Thư mục đầu ra của Maven & Gradle)
+# ==========================================
+target/
+build/
+out/
+bin/
+
+# ==========================================
+# 3. Application Server & Local Data (Server Tomcat/Glassfish)
+# ==========================================
+# Loại bỏ các thư mục server chạy cục bộ và các file lưu trữ phiên làm việc
+.smarttomcat/
+tomcat/
+work/
+temp/
+logs/
+
+# ==========================================
+# 4. VS Code (Cấu hình riêng của Visual Studio Code)
+# ==========================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ==========================================
+# 5. Eclipse IDE (Cấu hình riêng của Eclipse)
+# ==========================================
+.metadata/
+.classpath
+.project
+.settings/
+*.pref
+
+# ==========================================
+# 6. IntelliJ IDEA (Cấu hình riêng của IntelliJ)
+# ==========================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ==========================================
+# 7. OS Generated Files (File rác hệ điều hành)
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
