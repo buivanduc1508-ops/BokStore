@@ -18,6 +18,8 @@ target/
 build/
 out/
 bin/
+.runtime/
+src/main/webapp/WEB-INF/classes/
 
 # ==========================================
 # 3. Application Server & Local Data (Server Tomcat/Glassfish)
