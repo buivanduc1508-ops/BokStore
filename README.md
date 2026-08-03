@@ -15,5 +15,3 @@ Tài khoản mẫu: `admin/admin123` và `user/user123`.
 - Khách hàng: tìm kiếm, lọc, sắp xếp, giỏ hàng, đặt/hủy đơn, yêu thích, đánh giá, hồ sơ và đổi mật khẩu.
 - Quản trị: danh mục, sản phẩm, nhập kho, ẩn/khôi phục, tài khoản, hóa đơn, doanh thu, bán chạy và cảnh báo tồn kho.
 - Bảo mật: PBKDF2, CSRF token, phân quyền server-side, giới hạn đăng nhập sai và security headers.
-
-Theo yêu cầu hiện tại, dữ liệu vận hành được giữ trong bộ nhớ; phần SQL Server chưa được kích hoạt.
