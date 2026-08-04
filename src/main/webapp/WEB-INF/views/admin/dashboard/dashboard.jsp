@@ -1,4 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <section>
     <p class="eyebrow">ADMIN VIEW</p>
     <h1>Trang quản trị mẫu</h1>
