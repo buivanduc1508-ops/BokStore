@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectDB {
-    public static Connection con = null;
+  public static Connection con = null;
 
     public static Connection getConnect() {
         // Thay tên database, tài khoản và mật khẩu theo máy của nhóm.
@@ -14,17 +14,22 @@ public class ConnectDB {
                 + "user=sa;password=1234;"
                 + "encrypt=true;trustServerCertificate=true";
 
-        try {
-            con = DriverManager.getConnection(strDbUrl);
-            System.out.println("Kết nối thành công");
-        } catch (SQLException e) {
-            System.err.println("Kết nối lỗi: " + e.getMessage());
-        }
-
-        return con;
+    try {
+      con = DriverManager.getConnection(strDbUrl);
+      System.out.println("Kết nối BOOKSTORE thành công");
+    } catch (SQLException e) {
+      System.err.println("Không thể kết nối BOOKSTORE: " + e.getMessage());
     }
 
-    public static void main(String[] args) {
-        ConnectDB.getConnect();
-    }
+    return con;
+  }
+
+  private static String env(String name, String fallback) {
+    String value = System.getenv(name);
+    return value == null || value.isBlank() ? fallback : value;
+  }
+
+  public static void main(String[] args) {
+    ConnectDB.getConnect();
+  }
 }
