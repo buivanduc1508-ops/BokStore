@@ -28,21 +28,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src/main/webapp/assets/images</name>
-			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Bookly-1.0.0/Bookly-1.0.0/images</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/assets/js</name>
-			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Bookly-1.0.0/Bookly-1.0.0/js</locationURI>
-		</link>
-		<link>
-			<name>src/main/webapp/assets/css/css</name>
-			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Bookly-1.0.0/Bookly-1.0.0/css</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

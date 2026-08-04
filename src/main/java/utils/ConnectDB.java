@@ -7,27 +7,12 @@ import java.sql.SQLException;
 public class ConnectDB {
   public static Connection con = null;
 
-  public static Connection getConnect() {
-    String host = env("BOOKSTORE_DB_HOST", "localhost");
-    String port = env("BOOKSTORE_DB_PORT", "1433");
-    String database = env("BOOKSTORE_DB_NAME", "BOOKSTORE");
-    String user = env("BOOKSTORE_DB_USER", "sa");
-    String password = env("BOOKSTORE_DB_PASSWORD", "");
-    String strDbUrl =
-        "jdbc:sqlserver://"
-            + host
-            + ":"
-            + port
-            + ";"
-            + "databaseName="
-            + database
-            + ";"
-            + "user="
-            + user
-            + ";password="
-            + password
-            + ";"
-            + "encrypt=true;trustServerCertificate=true";
+    public static Connection getConnect() {
+        // Thay tên database, tài khoản và mật khẩu theo máy của nhóm.
+        String strDbUrl = "jdbc:sqlserver://localhost:1433;"
+                + "databaseName=BOOKSTORE;"
+                + "user=sa;password=1234;"
+                + "encrypt=true;trustServerCertificate=true";
 
     try {
       con = DriverManager.getConnection(strDbUrl);
