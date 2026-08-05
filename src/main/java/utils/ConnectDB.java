@@ -1,24 +1,32 @@
 package utils;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectDB {
-  public static Connection getConnect() {
-    String databaseUrl = "jdbc:sqlserver://" + env("DB_HOST", "localhost") + ":" + env("DB_PORT", "1433") + ";"
-        + "databaseName=" + env("DB_NAME", "BOOKSTORE") + ";"
-        + "user=" + env("DB_USER", "sa") + ";password=" + env("DB_PASSWORD", "1234") + ";"
-        + "encrypt=true;trustServerCertificate=true";
+/** Creates connections to the embedded H2 database. No database server is required. */
+public final class ConnectDB {
+  private ConnectDB() {}
 
+  static {
     try {
-      Connection connection = DriverManager.getConnection(databaseUrl);
-      System.out.println("Ket noi BOOKSTORE thanh cong");
-      return connection;
-    } catch (SQLException e) {
-      System.err.println("Khong the ket noi BOOKSTORE: " + e.getMessage());
-      return null;
+      Class.forName("org.h2.Driver");
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("Không tìm thấy H2 JDBC driver", e);
     }
+  }
+
+  public static Connection getConnect() throws SQLException {
+    String customUrl = System.getenv("DB_URL");
+    String url = customUrl == null || customUrl.isBlank() ? defaultUrl() : customUrl;
+    return DriverManager.getConnection(url, env("DB_USER", "sa"), env("DB_PASSWORD", ""));
+  }
+
+  private static String defaultUrl() {
+    String base = System.getProperty("catalina.base", System.getProperty("user.dir"));
+    String file = Path.of(base, "data", "bokstore").toAbsolutePath().toString().replace('\\', '/');
+    return "jdbc:h2:file:" + file + ";AUTO_SERVER=TRUE";
   }
 
   private static String env(String name, String fallback) {
@@ -26,7 +34,9 @@ public class ConnectDB {
     return value == null || value.isBlank() ? fallback : value;
   }
 
-  public static void main(String[] args) {
-    ConnectDB.getConnect();
+  public static void main(String[] args) throws SQLException {
+    try (Connection connection = getConnect()) {
+      System.out.println("H2 connected: " + connection.getMetaData().getURL());
+    }
   }
 }

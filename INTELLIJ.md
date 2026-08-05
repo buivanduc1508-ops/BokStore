@@ -39,10 +39,6 @@ target/BokStore.war
 
 ## Database
 
-The app reads the optional environment variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`. The development defaults are:
+No external database server is required. BokStore uses an embedded H2 file database and creates it automatically under Tomcat's `data` directory. To reset all learning data, stop Tomcat and delete `data/bokstore.mv.db`; the sample data will be recreated on the next start.
 
-```text
-jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE;user=sa;password=1234
-```
-
-Make sure SQL Server is running and the `BOOKSTORE` database has been created before testing database-backed pages.
+An optional `DB_URL` environment variable can point H2 to another file location.

@@ -1,6 +1,6 @@
 # BokStore
 
-Ứng dụng bán sách Java Servlet/JSP, dùng Java 17, Maven và Tomcat 10.1.
+Ứng dụng bán sách Java Servlet/JSP, dùng Java 17, Maven, Tomcat 10.1 và database H2 nhúng.
 
 ## Chạy trong IntelliJ IDEA
 
@@ -14,6 +14,10 @@ Hướng dẫn chi tiết nằm trong [INTELLIJ.md](INTELLIJ.md).
 
 ## Cơ sở dữ liệu
 
-Khởi tạo SQL Server bằng `Data.sql` và `database/BOOKSTORE_UPGRADE.sql`. Có thể cấu hình kết nối bằng các biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. Giá trị mặc định dành cho môi trường phát triển là `localhost:1433`, database `BOOKSTORE`, tài khoản `sa`, mật khẩu `1234`.
+Không cần cài SQL Server. Ứng dụng tự tạo database H2 ở `.runtime/apache-tomcat-10.1.54/data/bokstore.mv.db` khi mở trang sản phẩm lần đầu. Tài khoản, sản phẩm, đơn hàng, yêu thích và đánh giá được giữ lại sau khi khởi động lại Tomcat.
+
+Muốn đặt database ở vị trí khác, cấu hình biến môi trường `DB_URL`, ví dụ `jdbc:h2:file:D:/bokstore-data/bokstore;AUTO_SERVER=TRUE`.
+
+Hai script SQL Server cũ được giữ trong `Data.sql` và `database/BOOKSTORE_UPGRADE.sql` để tham khảo khi học chuyển đổi hệ quản trị cơ sở dữ liệu.
 
 Tài khoản mẫu: `admin/admin123` và `user/user123`.
