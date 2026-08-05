@@ -12,19 +12,21 @@ import utils.PasswordUtils;
  */
 public final class StoreDAO {
   private static final StoreDAO INSTANCE = new StoreDAO();
+  private final StoreDatabase database = new StoreDatabase();
   private final List<Category> categories = Collections.synchronizedList(new ArrayList<>());
   private final List<Book> books = Collections.synchronizedList(new ArrayList<>());
   private final List<User> users = Collections.synchronizedList(new ArrayList<>());
   private final List<Order> orders = Collections.synchronizedList(new ArrayList<>());
   private final List<Review> reviews = Collections.synchronizedList(new ArrayList<>());
   private final Map<Integer, Set<Integer>> favorites = new HashMap<>();
-  private final AtomicInteger categorySeq = new AtomicInteger(4),
-      bookSeq = new AtomicInteger(7),
-      userSeq = new AtomicInteger(3),
-      orderSeq = new AtomicInteger(1),
-      reviewSeq = new AtomicInteger(1);
+  private final AtomicInteger categorySeq = new AtomicInteger(), bookSeq = new AtomicInteger(),
+      userSeq = new AtomicInteger(), orderSeq = new AtomicInteger(), reviewSeq = new AtomicInteger();
 
   private StoreDAO() {
+    if (database.load(categories, books, users, orders, reviews, favorites)) {
+      resetSequences();
+      return;
+    }
     categories.add(new Category(1, "Văn học"));
     categories.add(new Category(2, "Kỹ năng"));
     categories.add(new Category(3, "Công nghệ"));
@@ -114,6 +116,20 @@ public final class StoreDAO {
             "user",
             PasswordUtils.hash("user123"),
             "USER"));
+    resetSequences();
+    persist();
+  }
+
+  private void resetSequences() {
+    categorySeq.set(categories.stream().mapToInt(Category::getId).max().orElse(0) + 1);
+    bookSeq.set(books.stream().mapToInt(Book::getId).max().orElse(0) + 1);
+    userSeq.set(users.stream().mapToInt(User::getId).max().orElse(0) + 1);
+    orderSeq.set(orders.stream().mapToInt(Order::getId).max().orElse(0) + 1);
+    reviewSeq.set(reviews.stream().mapToInt(Review::getId).max().orElse(0) + 1);
+  }
+
+  private synchronized void persist() {
+    database.save(categories, books, users, orders, reviews, favorites);
   }
 
   public static StoreDAO get() {
@@ -134,13 +150,17 @@ public final class StoreDAO {
       c = new Category(categorySeq.getAndIncrement(), name);
       categories.add(c);
     } else c.setName(name);
+    persist();
     return c;
   }
 
   public synchronized boolean deleteCategory(int id) {
     if (books.stream().anyMatch(b -> !b.isDeleted() && b.getCategoryId() == id)) return false;
     Category c = category(id);
-    if (c != null) c.setDeleted(true);
+    if (c != null) {
+      c.setDeleted(true);
+      persist();
+    }
     return c != null;
   }
 
@@ -208,17 +228,24 @@ public final class StoreDAO {
       b.setCategoryId(category);
       b.setStock(stock);
     }
+    persist();
     return b;
   }
 
   public void deleteBook(int id) {
     Book b = books.stream().filter(x -> x.getId() == id).findFirst().orElse(null);
-    if (b != null) b.setDeleted(true);
+    if (b != null) {
+      b.setDeleted(true);
+      persist();
+    }
   }
 
   public void restoreBook(int id) {
     Book b = books.stream().filter(x -> x.getId() == id).findFirst().orElse(null);
-    if (b != null) b.setDeleted(false);
+    if (b != null) {
+      b.setDeleted(false);
+      persist();
+    }
   }
 
   public List<Book> deletedBooks() {
@@ -282,18 +309,22 @@ public final class StoreDAO {
       if (password != null && !password.isBlank()) u.setPassword(PasswordUtils.hash(password));
       u.setRole(role);
     }
+    persist();
     return u;
   }
 
   public boolean deleteUser(int id, int actor) {
     if (id == actor) return false;
-    return users.removeIf(x -> x.getId() == id);
+    boolean removed = users.removeIf(x -> x.getId() == id);
+    if (removed) persist();
+    return removed;
   }
 
   public boolean toggleUser(int id, int actor) {
     User u = user(id);
     if (u == null || id == actor) return false;
     u.setActive(!u.isActive());
+    persist();
     return true;
   }
 
@@ -323,6 +354,7 @@ public final class StoreDAO {
       b.setSold(b.getSold() + e.getValue());
     }
     orders.add(o);
+    persist();
     return o;
   }
 
@@ -353,6 +385,7 @@ public final class StoreDAO {
         b.setSold(Math.max(0, b.getSold() - e.getValue()));
       }
     }
+    persist();
     return true;
   }
 
@@ -383,6 +416,7 @@ public final class StoreDAO {
         }
       }
     o.setStatus(status);
+    persist();
     return true;
   }
 
@@ -419,12 +453,17 @@ public final class StoreDAO {
     Book b = book(id);
     if (b == null || quantity < 1) throw new IllegalArgumentException("Số lượng nhập không hợp lệ");
     b.setStock(b.getStock() + quantity);
+    persist();
   }
 
   public synchronized boolean toggleFavorite(int userId, int bookId) {
     Set<Integer> set = favorites.computeIfAbsent(userId, k -> new LinkedHashSet<>());
-    if (set.remove(bookId)) return false;
+    if (set.remove(bookId)) {
+      persist();
+      return false;
+    }
     set.add(bookId);
+    persist();
     return true;
   }
 
@@ -446,6 +485,7 @@ public final class StoreDAO {
     Review r =
         new Review(reviewSeq.getAndIncrement(), u.getId(), bookId, u.getName(), rating, content);
     reviews.add(r);
+    persist();
     return r;
   }
 

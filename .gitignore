@@ -10,6 +10,7 @@
 *.zip
 *.tar.gz
 *.rar
+!src/main/webapp/WEB-INF/lib/h2-*.jar
 
 # ==========================================
 # 2. Build Tools (Thư mục đầu ra của Maven & Gradle)
@@ -18,6 +19,7 @@ target/
 build/
 out/
 bin/
+data/
 .runtime/
 src/main/webapp/WEB-INF/classes/
 
