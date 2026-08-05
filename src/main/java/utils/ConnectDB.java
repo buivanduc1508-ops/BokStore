@@ -5,23 +5,20 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectDB {
-  public static Connection con = null;
-
-    public static Connection getConnect() {
-        // Thay tên database, tài khoản và mật khẩu theo máy của nhóm.
-        String strDbUrl = "jdbc:sqlserver://localhost:1433;"
-                + "databaseName=BOOKSTORE;"
-                + "user=sa;password=1234;"
-                + "encrypt=true;trustServerCertificate=true";
+  public static Connection getConnect() {
+    String databaseUrl = "jdbc:sqlserver://" + env("DB_HOST", "localhost") + ":" + env("DB_PORT", "1433") + ";"
+        + "databaseName=" + env("DB_NAME", "BOOKSTORE") + ";"
+        + "user=" + env("DB_USER", "sa") + ";password=" + env("DB_PASSWORD", "1234") + ";"
+        + "encrypt=true;trustServerCertificate=true";
 
     try {
-      con = DriverManager.getConnection(strDbUrl);
-      System.out.println("Kết nối BOOKSTORE thành công");
+      Connection connection = DriverManager.getConnection(databaseUrl);
+      System.out.println("Ket noi BOOKSTORE thanh cong");
+      return connection;
     } catch (SQLException e) {
-      System.err.println("Không thể kết nối BOOKSTORE: " + e.getMessage());
+      System.err.println("Khong the ket noi BOOKSTORE: " + e.getMessage());
+      return null;
     }
-
-    return con;
   }
 
   private static String env(String name, String fallback) {
