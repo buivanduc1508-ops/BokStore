@@ -1,17 +1,19 @@
 # BokStore
 
-Ứng dụng bán sách Java Servlet/JSP chạy trên Tomcat 10.1.
+Ứng dụng bán sách Java Servlet/JSP, dùng Java 17, Maven và Tomcat 10.1.
 
-## Chạy thử
+## Chạy trong IntelliJ IDEA
 
-1. Cấu hình dự án với JDK 17 trở lên và Tomcat 10.1.
-2. Thêm JSTL Jakarta vào `WEB-INF/lib`.
-3. Chạy ứng dụng và mở `/BokStore/home`.
+1. Mở thư mục dự án và chọn **Load Maven Project** khi IntelliJ nhận ra `pom.xml`.
+2. Chọn Project SDK là JDK 17 trở lên.
+3. Với IntelliJ IDEA Ultimate, tạo cấu hình **Tomcat Server > Local**, deploy artifact `BokStore:war exploded` với application context `/BokStore`.
+4. Với IntelliJ IDEA Community, mở Terminal của IntelliJ và chạy `run-intellij-runtime.bat`.
+5. Truy cập <http://localhost:8080/BokStore/home>.
+
+Hướng dẫn chi tiết nằm trong [INTELLIJ.md](INTELLIJ.md).
+
+## Cơ sở dữ liệu
+
+Khởi tạo SQL Server bằng `Data.sql` và `database/BOOKSTORE_UPGRADE.sql`. Có thể cấu hình kết nối bằng các biến môi trường `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`. Giá trị mặc định dành cho môi trường phát triển là `localhost:1433`, database `BOOKSTORE`, tài khoản `sa`, mật khẩu `1234`.
 
 Tài khoản mẫu: `admin/admin123` và `user/user123`.
-
-## Chức năng
-
-- Khách hàng: tìm kiếm, lọc, sắp xếp, giỏ hàng, đặt/hủy đơn, yêu thích, đánh giá, hồ sơ và đổi mật khẩu.
-- Quản trị: danh mục, sản phẩm, nhập kho, ẩn/khôi phục, tài khoản, hóa đơn, doanh thu, bán chạy và cảnh báo tồn kho.
-- Bảo mật: PBKDF2, CSRF token, phân quyền server-side, giới hạn đăng nhập sai và security headers.

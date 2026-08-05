@@ -4,7 +4,7 @@
 
 1. Open the project folder in IntelliJ IDEA.
 2. When IntelliJ detects `pom.xml`, choose to import/reload it as a Maven project.
-3. Go to `File > Project Structure > Project` and select JDK 17 or newer.
+3. Go to `File > Project Structure > Project` and select JDK 17 or newer. Set the language level to 17.
 4. Go to `File > Project Structure > Artifacts`.
 5. Add `Web Application: Exploded > From Modules`, then select module `BokStore`.
 6. Go to `Run > Edit Configurations > + > Tomcat Server > Local`.
@@ -21,7 +21,7 @@ IntelliJ IDEA Community does not include the built-in Tomcat run configuration. 
 run-intellij-runtime.bat
 ```
 
-The script compiles Java files into `WEB-INF/classes`, deploys `src/main/webapp` into `.runtime/apache-tomcat-10.1.54/webapps/BokStore`, and starts Tomcat.
+The script automatically detects the JDK from `JAVA_HOME` or `PATH`, compiles Java files into `target/intellij-runtime`, deploys the application into `.runtime/apache-tomcat-10.1.54/webapps/BokStore`, and starts Tomcat.
 
 ## Maven Build
 
@@ -39,7 +39,7 @@ target/BokStore.war
 
 ## Database
 
-The app currently connects to SQL Server with the settings in `src/main/java/utils/ConnectDB.java`:
+The app reads the optional environment variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`. The development defaults are:
 
 ```text
 jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE;user=sa;password=1234
