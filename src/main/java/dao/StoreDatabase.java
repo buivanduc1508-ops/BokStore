@@ -47,7 +47,8 @@ final class StoreDatabase {
       List<User> users,
       List<Order> orders,
       List<Review> reviews,
-      Map<Integer, Set<Integer>> favorites) {
+      Map<Integer, Set<Integer>> favorites,
+      Map<Integer, String> avatars) {
     try (Connection connection = ConnectDB.getConnect();
         PreparedStatement statement = connection.prepareStatement("SELECT payload FROM app_state WHERE id = 1");
         ResultSet result = statement.executeQuery()) {
@@ -59,7 +60,8 @@ final class StoreDatabase {
         users.addAll(snapshot.users);
         orders.addAll(snapshot.orders);
         reviews.addAll(snapshot.reviews);
-        favorites.putAll(snapshot.favorites);
+        if (snapshot.favorites != null) favorites.putAll(snapshot.favorites);
+        if (snapshot.avatars != null) avatars.putAll(snapshot.avatars);
         return true;
       }
     } catch (Exception e) {
@@ -73,10 +75,11 @@ final class StoreDatabase {
       List<User> users,
       List<Order> orders,
       List<Review> reviews,
-      Map<Integer, Set<Integer>> favorites) {
+      Map<Integer, Set<Integer>> favorites,
+      Map<Integer, String> avatars) {
     Snapshot snapshot =
         new Snapshot(List.copyOf(categories), List.copyOf(books), List.copyOf(users),
-            List.copyOf(orders), List.copyOf(reviews), Map.copyOf(favorites));
+            List.copyOf(orders), List.copyOf(reviews), Map.copyOf(favorites), Map.copyOf(avatars));
     try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream output = new ObjectOutputStream(bytes)) {
       output.writeObject(snapshot);
@@ -107,15 +110,17 @@ final class StoreDatabase {
     final List<Order> orders;
     final List<Review> reviews;
     final Map<Integer, Set<Integer>> favorites;
+    final Map<Integer, String> avatars;
 
     Snapshot(List<Category> categories, List<Book> books, List<User> users, List<Order> orders,
-        List<Review> reviews, Map<Integer, Set<Integer>> favorites) {
+        List<Review> reviews, Map<Integer, Set<Integer>> favorites, Map<Integer, String> avatars) {
       this.categories = categories;
       this.books = books;
       this.users = users;
       this.orders = orders;
       this.reviews = reviews;
       this.favorites = favorites;
+      this.avatars = avatars;
     }
   }
 }

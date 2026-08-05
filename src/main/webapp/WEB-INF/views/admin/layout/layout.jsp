@@ -55,9 +55,22 @@
         <footer class="admin-footer"><span>© <span data-current-year></span> BokStore</span><span>Hệ thống quản lý nhà sách</span></footer>
     </main>
 </div>
+<div class="admin-confirm" id="adminConfirm" hidden>
+    <div class="admin-confirm-backdrop" data-confirm-cancel></div>
+    <section class="admin-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+        <div class="admin-confirm-icon" aria-hidden="true">?</div>
+        <h2 id="confirmTitle">Xác nhận thao tác</h2>
+        <p id="confirmMessage">Bạn có chắc chắn muốn thực hiện thao tác này không?</p>
+        <div class="admin-confirm-actions">
+            <button type="button" class="confirm-cancel" data-confirm-cancel>Hủy</button>
+            <button type="button" class="confirm-accept" data-confirm-accept>Xác nhận</button>
+        </div>
+    </section>
+</div>
 <script src="<c:url value='/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js'/>"></script>
 <script src="<c:url value='/assets/js/bootstrap.bundle.min.js'/>"></script>
 <script src="<c:url value='/assets/js/main.js'/>"></script>
 <script>document.querySelectorAll('[data-current-year]').forEach(function(el){el.textContent=new Date().getFullYear();});document.querySelectorAll('form[method="post"],form[method="POST"]').forEach(function(f){if(!f.querySelector('[name="csrfToken"]')){var i=document.createElement('input');i.type='hidden';i.name='csrfToken';i.value='${sessionScope.csrfToken}';f.appendChild(i);}});var t=document.getElementById('appToast');if(t)setTimeout(function(){t.classList.add('hide')},3500);</script>
+<script src="<c:url value='/assets/js/admin-confirm.js'/>"></script>
 </body>
 </html>

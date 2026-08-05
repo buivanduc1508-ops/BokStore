@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="<c:url value='/assets/css/bokstore.css' />">
 <link rel="stylesheet" href="<c:url value='/assets/css/bokstore-extra.css' />">
 <link rel="stylesheet" href="<c:url value='/assets/css/bokstore-images.css' />">
+<link rel="stylesheet" href="<c:url value='/assets/css/account-menu.css' />">
 </head>
 <body class="client-layout">
 	<header class="site-header">
@@ -25,8 +26,36 @@
 					href="<c:url value='/home' />">Trang chủ</a> <a class="nav-link"
 					href="<c:url value='/shop' />">Sản phẩm</a> <a class="nav-link" href="<c:url value='/contact' />">Liên hệ</a>
 				<a class="nav-link" href="<c:url value='/cart' />">Giỏ hàng (${cartSize})</a>
-				<c:choose><c:when test="${not empty sessionScope.user}"><a class="nav-link" href="<c:url value='/wishlist' />">Yêu thích</a><a class="nav-link" href="<c:url value='/orders' />">Đơn hàng</a><a class="nav-link" href="<c:url value='/profile' />">Tài khoản</a><a class="nav-link" href="<c:url value='/logout' />">Đăng xuất</a></c:when><c:otherwise><a class="nav-link" href="<c:url value='/login' />">Đăng nhập</a></c:otherwise></c:choose>
-				<c:if test="${sessionScope.user.role eq 'ADMIN'}"><a class="nav-link" href="<c:url value='/admin/manage' />">Quản trị</a></c:if>
+				<c:choose>
+					<c:when test="${not empty sessionScope.user}">
+						<a class="nav-link" href="<c:url value='/wishlist' />">Yêu thích</a>
+						<a class="nav-link" href="<c:url value='/orders' />">Đơn hàng</a>
+						<c:if test="${sessionScope.user.role eq 'ADMIN'}"><a class="nav-link" href="<c:url value='/admin/manage' />">Quản trị</a></c:if>
+						<div class="account-menu" data-account-menu>
+							<button class="account-trigger" type="button" aria-label="Mở menu tài khoản" aria-expanded="false" aria-controls="accountDropdown">
+								<span class="account-avatar" aria-hidden="true"><c:choose><c:when test="${not empty avatarData}"><img src="<c:out value='${avatarData}' />" alt=""></c:when><c:otherwise><c:out value="${sessionScope.user.name.substring(0,1)}" /></c:otherwise></c:choose></span>
+								<span class="account-chevron" aria-hidden="true">⌄</span>
+							</button>
+							<div class="account-dropdown" id="accountDropdown" hidden>
+								<div class="account-summary">
+									<form class="avatar-form" method="post" action="<c:url value='/avatar' />">
+										<label class="avatar-change-button" title="Thay đổi ảnh đại diện">
+											<span class="account-avatar account-avatar-large"><c:choose><c:when test="${not empty avatarData}"><img src="<c:out value='${avatarData}' />" alt="Ảnh đại diện"></c:when><c:otherwise><c:out value="${sessionScope.user.name.substring(0,1)}" /></c:otherwise></c:choose></span>
+											<span class="avatar-camera" aria-hidden="true">✎</span>
+											<input class="avatar-file-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Chọn ảnh đại diện">
+										</label>
+										<input type="hidden" name="avatarData" value="">
+									</form>
+									<div><strong><c:out value="${sessionScope.user.name}" /></strong><small><c:out value="${sessionScope.user.email}" /></small><button class="avatar-change-text" type="button">Thay đổi avatar</button></div>
+								</div>
+								<p class="avatar-status" role="status" hidden></p>
+								<a href="<c:url value='/profile' />"><span aria-hidden="true">☺</span> Thông tin tài khoản</a>
+								<a class="account-logout" href="<c:url value='/logout' />"><span aria-hidden="true">→</span> Đăng xuất</a>
+							</div>
+						</div>
+					</c:when>
+					<c:otherwise><a class="nav-link" href="<c:url value='/login' />">Đăng nhập</a></c:otherwise>
+				</c:choose>
 			</nav>
 		</div>
 	</header>

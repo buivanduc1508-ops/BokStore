@@ -19,11 +19,12 @@ public final class StoreDAO {
   private final List<Order> orders = Collections.synchronizedList(new ArrayList<>());
   private final List<Review> reviews = Collections.synchronizedList(new ArrayList<>());
   private final Map<Integer, Set<Integer>> favorites = new HashMap<>();
+  private final Map<Integer, String> avatars = new HashMap<>();
   private final AtomicInteger categorySeq = new AtomicInteger(), bookSeq = new AtomicInteger(),
       userSeq = new AtomicInteger(), orderSeq = new AtomicInteger(), reviewSeq = new AtomicInteger();
 
   private StoreDAO() {
-    if (database.load(categories, books, users, orders, reviews, favorites)) {
+    if (database.load(categories, books, users, orders, reviews, favorites, avatars)) {
       resetSequences();
       return;
     }
@@ -129,7 +130,24 @@ public final class StoreDAO {
   }
 
   private synchronized void persist() {
-    database.save(categories, books, users, orders, reviews, favorites);
+    database.save(categories, books, users, orders, reviews, favorites, avatars);
+  }
+
+  public String avatar(int userId) {
+    return avatars.getOrDefault(userId, "");
+  }
+
+  public synchronized void updateAvatar(int userId, String avatarData) {
+    if (user(userId) == null) throw new IllegalArgumentException("Tài khoản không tồn tại");
+    if (avatarData == null || avatarData.isBlank()) {
+      avatars.remove(userId);
+    } else {
+      if (!avatarData.matches("^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$")
+          || avatarData.length() > 750_000)
+        throw new IllegalArgumentException("Ảnh đại diện không hợp lệ hoặc quá lớn");
+      avatars.put(userId, avatarData);
+    }
+    persist();
   }
 
   public static StoreDAO get() {
