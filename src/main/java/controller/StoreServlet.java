@@ -19,6 +19,7 @@ import utils.PasswordUtils;
       "/logout",
       "/register",
       "/profile",
+      "/avatar",
       "/cart",
       "/checkout",
       "/orders",
@@ -243,6 +244,13 @@ public class StoreServlet extends HttpServlet {
         resp.sendRedirect(req.getContextPath() + "/profile");
         return;
       }
+      if ("/avatar".equals(path)) {
+        User u = requireUser(req);
+        dao.updateAvatar(u.getId(), req.getParameter("avatarData"));
+        flash(req, "Đã cập nhật ảnh đại diện");
+        resp.sendRedirect(req.getContextPath() + "/home");
+        return;
+      }
       if ("/contact".equals(path)) {
         flash(req, "Cảm ơn bạn đã liên hệ. BokStore sẽ phản hồi sớm nhất.");
         resp.sendRedirect(req.getContextPath() + "/contact");
@@ -413,6 +421,8 @@ public class StoreServlet extends HttpServlet {
     r.setAttribute("activePage", active);
     r.setAttribute("contentPage", page);
     r.setAttribute("cartSize", cart(r).values().stream().mapToInt(Integer::intValue).sum());
+    User currentUser = user(r);
+    r.setAttribute("avatarData", currentUser == null ? "" : dao.avatar(currentUser.getId()));
     r.getRequestDispatcher("/WEB-INF/views/client/layout/layout.jsp").forward(r, p);
   }
 
