@@ -19,13 +19,6 @@ import model.Review;
 import model.User;
 import utils.ConnectDB;
 
-/**
- * Small embedded persistence adapter for the learning project.
- *
- * <p>The domain objects remain simple Java objects while this class demonstrates JDBC connections,
- * prepared statements and transactions. A later exercise can replace the snapshot with normalized
- * repository tables without changing the servlet layer.
- */
 final class StoreDatabase {
   StoreDatabase() {
     initialize();

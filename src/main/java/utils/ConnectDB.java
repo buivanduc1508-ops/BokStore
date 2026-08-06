@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/** Creates connections to the embedded H2 database. No database server is required. */
 public final class ConnectDB {
   private ConnectDB() {}
 
