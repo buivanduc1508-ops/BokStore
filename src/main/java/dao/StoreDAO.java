@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 import model.*;
 import utils.PasswordUtils;
 
-/**
- * Kho dữ liệu dùng chung. Có thể thay các phương thức này bằng JDBC mà không đổi controller/view.
- */
 public final class StoreDAO {
   private static final StoreDAO INSTANCE = new StoreDAO();
   private final StoreDatabase database = new StoreDatabase();

@@ -416,12 +416,3 @@ var myline = new Chart(line, {
         },
     }
 });
-
-// let ctx1 = document.getElementById("canvas1").getContext("2d");
-// let ctx2 = document.getElementById("canvas2").getContext("2d");
-// let ctx3 = document.getElementById("canvas3").getContext("2d");
-// let ctx4 = document.getElementById("canvas4").getContext("2d");
-// var lineChart1 = new Chart(ctx1, config1);
-// var lineChart2 = new Chart(ctx2, config2);
-// var lineChart3 = new Chart(ctx3, config3);
-// var lineChart4 = new Chart(ctx4, config4);

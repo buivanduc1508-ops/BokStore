@@ -6,7 +6,6 @@ import model.Book;
 import model.Order;
 import model.User;
 
-/** Simple integration test that can run without JUnit from IntelliJ or the terminal. */
 public class StoreDAOTest {
   public static void main(String[] args) {
     StoreDAO dao = StoreDAO.get();
