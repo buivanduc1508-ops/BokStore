@@ -60,7 +60,10 @@ public class StoreServlet extends HttpServlet {
       case "/book":
         {
           Book b = dao.book(i(req, "id"));
-          if (b != null) b.setViews(b.getViews() + 1);
+          if (b != null) {
+            b.setViews(b.getViews() + 1);
+            rememberViewed(req, b.getId());
+          }
           req.setAttribute("book", b);
           req.setAttribute("reviews", dao.reviews(i(req, "id")));
           req.setAttribute("rating", dao.rating(i(req, "id")));
@@ -279,7 +282,32 @@ public class StoreServlet extends HttpServlet {
                 i(r, "category"),
                 r.getParameter("publisher"),
                 r.getParameter("availability")));
+    String shelf = s(r, "shelf");
     String sort = s(r, "sort");
+
+    if ("viewed".equals(shelf)) {
+      List<Integer> viewed = viewedBooks(r);
+      Map<Integer, Integer> order = new HashMap<>();
+      for (int x = 0; x < viewed.size(); x++) order.put(viewed.get(x), x);
+      all.removeIf(book -> !order.containsKey(book.getId()));
+      all.sort(Comparator.comparingInt(book -> order.get(book.getId())));
+      r.setAttribute("shopTitle", "Sách đã xem");
+      r.setAttribute("shopSubtitle", "Những cuốn sách bạn vừa mở gần đây.");
+    } else if ("new".equals(shelf)) {
+      all.sort(Comparator.comparingInt(Book::getId).reversed());
+      r.setAttribute("shopTitle", "Sách mới");
+      r.setAttribute("shopSubtitle", "Các đầu sách mới được thêm vào BokStore.");
+    } else if ("promo".equals(shelf)) {
+      all.removeIf(book -> book.getPrice() > 100000);
+      all.sort(Comparator.comparingLong(Book::getPrice));
+      r.setAttribute("shopTitle", "Sách khuyến mãi");
+      r.setAttribute("shopSubtitle", "Các đầu sách giá tốt dưới 100.000 đ.");
+    } else {
+      r.setAttribute("shopTitle", "Cửa hàng sách");
+      r.setAttribute("shopSubtitle", "Tất cả đầu sách đang có tại BokStore.");
+      if (sort.isBlank()) all.sort(Comparator.comparingInt(Book::getId).reversed());
+    }
+
     if ("priceAsc".equals(sort)) all.sort(Comparator.comparingLong(Book::getPrice));
     else if ("priceDesc".equals(sort))
       all.sort(Comparator.comparingLong(Book::getPrice).reversed());
@@ -296,6 +324,24 @@ public class StoreServlet extends HttpServlet {
     r.setAttribute("totalPages", totalPages);
     r.setAttribute("categories", dao.categories());
     r.setAttribute("topBooks", dao.top10());
+    r.setAttribute("shopShelf", shelf);
+  }
+
+  @SuppressWarnings("unchecked")
+  private List<Integer> viewedBooks(HttpServletRequest r) {
+    List<Integer> viewed = (List<Integer>) r.getSession().getAttribute("viewedBooks");
+    if (viewed == null) {
+      viewed = new LinkedList<>();
+      r.getSession().setAttribute("viewedBooks", viewed);
+    }
+    return viewed;
+  }
+
+  private void rememberViewed(HttpServletRequest r, int bookId) {
+    List<Integer> viewed = viewedBooks(r);
+    viewed.remove(Integer.valueOf(bookId));
+    viewed.add(0, bookId);
+    while (viewed.size() > 12) viewed.remove(viewed.size() - 1);
   }
 
   @SuppressWarnings("unchecked")

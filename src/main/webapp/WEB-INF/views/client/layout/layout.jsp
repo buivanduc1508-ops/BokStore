@@ -14,14 +14,14 @@
 <link rel="stylesheet" href="<c:url value='/assets/css/bokstore-extra.css' />">
 <link rel="stylesheet" href="<c:url value='/assets/css/bokstore-images.css' />">
 <link rel="stylesheet" href="<c:url value='/assets/css/account-menu.css' />">
-<link rel="stylesheet" href="<c:url value='/assets/css/mot-header.css' />?v=20260806d">
+<link rel="stylesheet" href="<c:url value='/assets/css/mot-header.css' />?v=20260806g">
 </head>
 <body class="client-layout">
 	<header class="mot-header">
 		<div class="container mot-topbar">
-			<a class="mot-brand" href="<c:url value='/home' />" aria-label="MOT Bookstore">
+			<a class="mot-brand" href="<c:url value='/home' />" aria-label="Bookstore">
 				<span class="mot-logo-icon" aria-hidden="true"></span>
-				<span class="mot-logo-text">MOT<br>BOOKSTORE</span>
+				<span class="mot-logo-text"><br>BOOKSTORE</span>
 			</a>
 
 			<form class="mot-search" action="<c:url value='/shop' />" method="get" role="search">
@@ -92,10 +92,10 @@
 				</aside>
 
 				<nav class="mot-main-nav" aria-label="Điều hướng chính">
-					<a href="<c:url value='/shop' />">SÁCH ĐÃ XEM⌄</a>
-					<a href="<c:url value='/shop' />">TẤT CẢ SÁCH</a>
-					<a href="<c:url value='/shop?sort=name' />">SÁCH MỚI</a>
-					<a href="<c:url value='/shop?availability=in' />">SÁCH KHUYẾN MÃI</a>
+					<a class="${activePage eq 'shop' and shopShelf eq 'viewed' ? 'is-active' : ''}" href="<c:url value='/shop?shelf=viewed' />">SÁCH ĐÃ XEM⌄</a>
+					<a class="${activePage eq 'shop' and empty shopShelf ? 'is-active' : ''}" href="<c:url value='/shop' />">TẤT CẢ SÁCH</a>
+					<a class="${activePage eq 'shop' and shopShelf eq 'new' ? 'is-active' : ''}" href="<c:url value='/shop?shelf=new' />">SÁCH MỚI</a>
+					<a class="${activePage eq 'shop' and shopShelf eq 'promo' ? 'is-active' : ''}" href="<c:url value='/shop?shelf=promo' />">SÁCH KHUYẾN MÃI</a>
 				</nav>
 			</div>
 		</div>

@@ -19,6 +19,18 @@ List<Category> cats = (List<Category>) request.getAttribute("categories");
 int pageNo = (Integer) request.getAttribute("page");
 int pages = (Integer) request.getAttribute("totalPages");
 String q = request.getParameter("q") == null ? "" : request.getParameter("q");
+String shelf = request.getAttribute("shopShelf") == null ? "" : (String) request.getAttribute("shopShelf");
+String shopTitle = request.getAttribute("shopTitle") == null ? "Cửa hàng sách" : (String) request.getAttribute("shopTitle");
+String shopSubtitle = request.getAttribute("shopSubtitle") == null ? "" : (String) request.getAttribute("shopSubtitle");
+String categoryParam = request.getParameter("category") == null ? "" : request.getParameter("category");
+String availabilityParam = request.getParameter("availability") == null ? "" : request.getParameter("availability");
+String sortParam = request.getParameter("sort") == null ? "" : request.getParameter("sort");
+String pageQuery = "";
+if (!shelf.isBlank()) pageQuery += "&shelf=" + java.net.URLEncoder.encode(shelf, java.nio.charset.StandardCharsets.UTF_8);
+if (!q.isBlank()) pageQuery += "&q=" + java.net.URLEncoder.encode(q, java.nio.charset.StandardCharsets.UTF_8);
+if (!categoryParam.isBlank()) pageQuery += "&category=" + java.net.URLEncoder.encode(categoryParam, java.nio.charset.StandardCharsets.UTF_8);
+if (!availabilityParam.isBlank()) pageQuery += "&availability=" + java.net.URLEncoder.encode(availabilityParam, java.nio.charset.StandardCharsets.UTF_8);
+if (!sortParam.isBlank()) pageQuery += "&sort=" + java.net.URLEncoder.encode(sortParam, java.nio.charset.StandardCharsets.UTF_8);
 %>
 <section class="shop-hero">
   <div class="container">
@@ -31,11 +43,17 @@ String q = request.getParameter("q") == null ? "" : request.getParameter("q");
   <div class="section-heading">
     <div>
       <span class="eyebrow">KHÁM PHÁ</span>
-      <h2>Cửa hàng sách</h2>
+      <h2><%=shopTitle%></h2>
+      <% if (!shopSubtitle.isBlank()) { %>
+        <p class="shop-subtitle"><%=shopSubtitle%></p>
+      <% } %>
     </div>
     <span class="result-count"><%=request.getAttribute("totalItems")%> sản phẩm</span>
   </div>
   <form class="filter-bar" method="get">
+    <% if (!shelf.isBlank()) { %>
+      <input type="hidden" name="shelf" value="<%=shelf%>">
+    <% } %>
     <label class="search-field"><span>⌕</span><input name="q" value="<%=q%>" placeholder="Tìm theo tên sách hoặc tác giả"></label>
     <select name="category">
       <option value="0">Tất cả danh mục</option>
@@ -86,9 +104,14 @@ String q = request.getParameter("q") == null ? "" : request.getParameter("q");
       </article>
     <% } %>
   </div>
+  <% if (books.isEmpty()) { %>
+    <p class="empty-state">
+      <%= "viewed".equals(shelf) ? "Bạn chưa xem cuốn sách nào. Hãy mở chi tiết một cuốn sách để lưu vào mục này." : "Không tìm thấy sách phù hợp." %>
+    </p>
+  <% } %>
   <nav class="pagination">
     <% for (int x = 1; x <= pages; x++) { %>
-      <a class="<%=x == pageNo ? "active" : ""%>" href="?page=<%=x%>&q=<%=q%>"><%=x%></a>
+      <a class="<%=x == pageNo ? "active" : ""%>" href="?page=<%=x%><%=pageQuery%>"><%=x%></a>
     <% } %>
   </nav>
 </section>

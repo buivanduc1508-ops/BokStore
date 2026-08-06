@@ -54,8 +54,9 @@ body.client-layout {
 .mot-logo-text {
   font-family: "Playfair Display", Georgia, serif;
   font-size: 19px;
-  line-height: .78;
+  line-height: .9;
   letter-spacing: -.7px;
+  transform: translateY(-1px);
 }
 
 .mot-search {
@@ -73,8 +74,13 @@ body.client-layout {
   border-radius: 0;
   padding: 0 16px;
   color: #555;
-  font: 15px Georgia, "Times New Roman", serif;
+  font: 15px/34px "Be Vietnam Pro", Arial, sans-serif;
   box-shadow: none;
+}
+
+.mot-search input::placeholder {
+  color: #6d6d6d;
+  opacity: 1;
 }
 
 .mot-search input:focus {
@@ -249,6 +255,25 @@ body.client-layout {
   text-decoration: none;
   font: 700 13px Arial, sans-serif;
   letter-spacing: .2px;
+}
+
+.mot-main-nav a.is-active {
+  color: #d71920;
+}
+
+.shop-subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.empty-state {
+  margin: 24px 0;
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--muted);
 }
 
 .mot-header .account-menu {
