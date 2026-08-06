@@ -1,0 +1,97 @@
+<%@ page import="java.util.*,model.*,dao.StoreDAO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%Map<Integer,Integer> cart=(Map<Integer,Integer>)request.getAttribute("cart");long total=0;%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/bokstore.css">
+<section class="container content-section">
+  <div class="quick-nav">
+    <a href="<%=request.getContextPath()%>/shop">
+      Tiếp tục mua
+    </a>
+    <a href="<%=request.getContextPath()%>/orders">
+      Đơn hàng
+    </a>
+  </div>
+  <h1>
+    Giỏ hàng
+  </h1>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>
+          Sách
+        </th>
+        <th>
+          Giá
+        </th>
+        <th>
+          Số lượng
+        </th>
+        <th>
+          Thành tiền
+        </th>
+        <th>
+        </th>
+      </tr>
+      <%for(Map.Entry<Integer,Integer> e:cart.entrySet()){Book b=StoreDAO.get().book(e.getKey());if(b==null)continue;long line=b.getPrice()*e.getValue();total+=line;%>
+      <tr>
+        <td>
+          <%=b.getName()%>
+        </td>
+        <td>
+          <%=String.format("%,d",b.getPrice())%>
+          đ
+        </td>
+        <td>
+          <form method="post">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="id" value="<%=b.getId()%>">
+            <input type="number" name="qty" value="<%=e.getValue()%>" min="1">
+            <button>
+              Cập nhật
+            </button>
+          </form>
+        </td>
+        <td>
+          <%=String.format("%,d",line)%>
+          đ
+        </td>
+        <td>
+          <form method="post">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="id" value="<%=b.getId()%>">
+            <button>
+              Xóa
+            </button>
+          </form>
+        </td>
+      </tr>
+    <%}%>
+  </table>
+</div>
+<h2>
+  Tổng:
+  <%=String.format("%,d",total)%>
+  đ
+</h2>
+<%if(!cart.isEmpty()){%>
+  <form class="checkout" method="post" action="<%=request.getContextPath()%>/checkout">
+    <h2>
+      Thông tin nhận hàng
+    </h2>
+    <input name="customer" required placeholder="Họ tên">
+    <input name="phone" required placeholder="Số điện thoại">
+    <input name="address" required placeholder="Địa chỉ">
+    <select name="payment">
+      <option value="COD">
+        Thanh toán khi nhận hàng
+      </option>
+      <option value="ONLINE">
+        Online
+      </option>
+    </select>
+    <button>
+      Đặt hàng
+    </button>
+  </form>
+<%}%>
+</section>

@@ -1,0 +1,9 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<section class="container content-section">
+  <h1>
+    Về BokStore
+  </h1>
+  <p>
+    BokStore mang tri thức đến gần hơn với mọi người qua trải nghiệm mua sách đơn giản và thuận tiện.
+  </p>
+</section>

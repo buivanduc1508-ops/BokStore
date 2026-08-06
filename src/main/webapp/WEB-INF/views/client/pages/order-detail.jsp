@@ -1,0 +1,117 @@
+<%@ page import="java.util.*,model.*,dao.StoreDAO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%Order o=(Order)request.getAttribute("order");%>
+<section class="container content-section">
+  <div class="no-print">
+    <a href="<%=request.getContextPath()%>/orders">
+      ← Danh sách đơn hàng
+    </a>
+  </div>
+  <h1>
+    Hóa đơn #
+    <%=o.getId()%>
+  </h1>
+  <p class="print-only">
+    BOKSTORE · HÓA ĐƠN BÁN HÀNG
+  </p>
+  <div class="order-summary">
+    <div>
+      <small>
+        Người nhận
+      </small>
+      <strong>
+        <%=o.getCustomer()%>
+      </strong>
+    </div>
+    <div>
+      <small>
+        Số điện thoại
+      </small>
+      <strong>
+        <%=o.getPhone()%>
+      </strong>
+    </div>
+    <div>
+      <small>
+        Thanh toán
+      </small>
+      <strong>
+        <%=o.getPayment()%>
+      </strong>
+    </div>
+    <div>
+      <small>
+        Trạng thái
+      </small>
+      <strong>
+        <%=o.getStatus()%>
+      </strong>
+    </div>
+  </div>
+  <p>
+    <strong>
+      Địa chỉ:
+    </strong>
+    <%=o.getAddress()%>
+  </p>
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>
+          Sản phẩm
+        </th>
+        <th>
+          Đơn giá
+        </th>
+        <th>
+          Số lượng
+        </th>
+        <th>
+          Thành tiền
+        </th>
+      </tr>
+      <%for(Map.Entry<Integer,Integer> e:o.getItems().entrySet()){Book b=StoreDAO.get().book(e.getKey());long price=o.getPrices().getOrDefault(e.getKey(),b==null?0:b.getPrice());%>
+      <tr>
+        <td>
+          <%=b==null?"Sản phẩm đã ẩn":b.getName()%>
+        </td>
+        <td>
+          <%=String.format("%,d",price)%>
+          đ
+        </td>
+        <td>
+          <%=e.getValue()%>
+        </td>
+        <td>
+          <%=String.format("%,d",price*e.getValue())%>
+          đ
+        </td>
+      </tr>
+    <%}%>
+    <tr>
+      <th colspan="3">
+        Tổng cộng
+      </th>
+      <th>
+        <%=String.format("%,d",o.getTotal())%>
+        đ
+      </th>
+    </tr>
+  </table>
+</div>
+<h2>
+  Lịch sử trạng thái
+</h2>
+<ul>
+  <%for(String h:o.getHistory()){%>
+    <li>
+      <%=h%>
+    </li>
+  <%}%>
+</ul>
+<div class="no-print">
+  <button onclick="window.print()">
+    In hóa đơn
+  </button>
+</div>
+</section>
