@@ -125,6 +125,7 @@
 
       <!-- Form Chọn số lượng & Thao tác -->
       <form action="<c:url value='/cart' />" method="POST" class="buy-form">
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
         <input type="hidden" name="id" value="${bookId}">
         <input type="hidden" name="action" value="add">
 

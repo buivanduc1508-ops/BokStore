@@ -4,7 +4,7 @@
 private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
   String image = book == null || book.getImage() == null ? "" : book.getImage().trim();
   if (image.isEmpty()
-      || image.startsWith("http://")
+      || image.startsWith("https://")
       || image.startsWith("https://")
       || image.startsWith("/")
       || image.startsWith("data:")) {
@@ -43,11 +43,13 @@ double rating = (Double) request.getAttribute("rating");
         <p>Tồn kho: <%=b.getStock()%> · Lượt xem: <%=b.getViews()%> · Đã bán: <%=b.getSold()%></p>
         <div class="action-links">
           <form method="post" action="<%=request.getContextPath()%>/cart">
+            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
             <input type="hidden" name="id" value="<%=b.getId()%>">
             <input type="number" name="qty" min="1" max="<%=b.getStock()%>" value="1">
             <button>Thêm vào giỏ</button>
           </form>
           <form method="post" action="<%=request.getContextPath()%>/favorite">
+            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
             <input type="hidden" name="id" value="<%=b.getId()%>">
             <input type="hidden" name="returnTo" value="/book?id=<%=b.getId()%>">
             <button class="wishlist-btn"><%=Boolean.TRUE.equals(request.getAttribute("favorite")) ? "♥ Đã yêu thích" : "♡ Thêm yêu thích"%></button>
@@ -57,19 +59,23 @@ double rating = (Double) request.getAttribute("rating");
     </div>
     <section class="related-section">
       <h2>Đánh giá của khách hàng</h2>
-      <% if (session.getAttribute("user") != null) { %>
-        <form class="checkout" method="post" action="<%=request.getContextPath()%>/review">
-          <input type="hidden" name="bookId" value="<%=b.getId()%>">
-          <select name="rating">
-            <option value="5">5 sao - Tuyệt vời</option>
-            <option value="4">4 sao - Tốt</option>
-            <option value="3">3 sao - Bình thường</option>
-            <option value="2">2 sao</option>
-            <option value="1">1 sao</option>
-          </select>
-          <textarea name="content" required maxlength="500" placeholder="Chia sẻ cảm nhận của bạn"></textarea>
-          <button>Gửi đánh giá</button>
-        </form>
+      <%
+        jakarta.servlet.http.HttpSession sess = request.getSession(false);
+        if (sess != null && sess.getAttribute("user") != null) {
+      %>
+      <form class="checkout" method="post" action="<%=request.getContextPath()%>/review">
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+        <input type="hidden" name="bookId" value="<%=b.getId()%>">
+        <select name="rating">
+          <option value="5">5 sao - Tuyệt vời</option>
+          <option value="4">4 sao - Tốt</option>
+          <option value="3">3 sao - Bình thường</option>
+          <option value="2">2 sao</option>
+          <option value="1">1 sao</option>
+        </select>
+        <textarea name="content" required maxlength="500" placeholder="Chia sẻ cảm nhận của bạn"></textarea>
+        <button>Gửi đánh giá</button>
+      </form>
       <% } %>
       <div class="review-list">
         <% for (Review rv : reviews) { %>

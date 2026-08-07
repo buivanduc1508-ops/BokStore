@@ -145,11 +145,13 @@ public class StoreServlet extends HttpServlet {
         break;
       case "/admin/book-form":
         {
-          req.setAttribute("book", dao.book(i(req, "id")));
+          int bookId = i(req, "id");
+          Book bookForForm = dao.book(bookId);
+          req.setAttribute("book", bookForForm);
           req.setAttribute("categories", dao.categories());
           req.setAttribute("tab", "books");
           req.setAttribute("contentPage", "/WEB-INF/views/admin/pages/book-form.jsp");
-          req.setAttribute("pageTitle", "Chỉnh sửa sản phẩm");
+          req.setAttribute("pageTitle", bookForForm == null ? "Thêm sản phẩm" : "Chỉnh sửa sản phẩm");
           req.getRequestDispatcher("/WEB-INF/views/admin/layout/layout.jsp").forward(req, resp);
           break;
         }
@@ -265,6 +267,7 @@ public class StoreServlet extends HttpServlet {
           return;
         }
         adminAction(req);
+        flash(req, "Thao tác thành công!");
         resp.sendRedirect(req.getContextPath() + "/admin/manage?tab=" + s(req, "tab"));
         return;
       }
@@ -373,18 +376,28 @@ public class StoreServlet extends HttpServlet {
         throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
       if (s(r, "password").length() < 8)
         throw new IllegalArgumentException("Mật khẩu mới cần ít nhất 8 ký tự");
-      u.setPassword(PasswordUtils.hash(s(r, "password")));
-    } else {
-      validateUser(r, false);
       dao.saveUser(
           u.getId(),
-          s(r, "name"),
-          s(r, "email"),
-          s(r, "address"),
-          s(r, "phone"),
+          u.getName(),
+          u.getEmail(),
+          u.getAddress(),
+          u.getPhone(),
           u.getUsername(),
-          "",
+          s(r, "password"),
           u.getRole());
+    } else {
+      validateUser(r, false);
+      User updated =
+          dao.saveUser(
+              u.getId(),
+              s(r, "name"),
+              s(r, "email"),
+              s(r, "address"),
+              s(r, "phone"),
+              u.getUsername(),
+              "",
+              u.getRole());
+      r.getSession().setAttribute("user", updated);
     }
     flash(r, "Cập nhật tài khoản thành công");
   }

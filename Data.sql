@@ -1,204 +1,101 @@
-CREATE DATABASE BOOKSTORE;
-GO
+-- BAN BAN KHOI TAO CSDL H2 CHO DU AN BOKSTORE (H2 DATABASE ANSI SQL COMPATIBLE)
 
-USE BOOKSTORE;
-GO
-CREATE TABLE users (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    full_name NVARCHAR(100) NOT NULL,
-    email NVARCHAR(100) NOT NULL UNIQUE,
-    password_hash NVARCHAR(255) NOT NULL,
-    phone NVARCHAR(20),
-    address NVARCHAR(255),
-    role NVARCHAR(20) NOT NULL DEFAULT 'CUSTOMER',
-    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at DATETIME2 DEFAULT SYSDATETIME(),
-
-    CONSTRAINT CK_users_role
-        CHECK (role IN ('ADMIN', 'CUSTOMER')),
-
-    CONSTRAINT CK_users_status
-        CHECK (status IN ('ACTIVE', 'LOCKED'))
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    address VARCHAR(255),
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-GO
-CREATE TABLE danh_muc (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    name NVARCHAR(100) NOT NULL,
-    description NVARCHAR(500),
-    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at DATETIME2 DEFAULT SYSDATETIME(),
 
-    CONSTRAINT CK_danh_muc_status
-        CHECK (status IN ('ACTIVE', 'INACTIVE'))
+CREATE TABLE IF NOT EXISTS categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-GO
-CREATE TABLE san_pham (
-    id INT IDENTITY(1,1) PRIMARY KEY,
+
+CREATE TABLE IF NOT EXISTS books (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     category_id INT NOT NULL,
-    name NVARCHAR(150) NOT NULL,
-    description NVARCHAR(MAX),
-    price DECIMAL(18,2) NOT NULL,
-    image NVARCHAR(500),
-    quantity INT NOT NULL DEFAULT 0, -- Số lượng sách trong kho
-    status NVARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    created_at DATETIME2 DEFAULT SYSDATETIME(),
-
-    CONSTRAINT FK_san_pham_danh_muc
-        FOREIGN KEY (category_id) REFERENCES danh_muc(id),
-
-    CONSTRAINT CK_san_pham_price_non_negative
-        CHECK (price >= 0),
-
-    CONSTRAINT CK_san_pham_quantity_non_negative
-        CHECK (quantity >= 0),
-
-    CONSTRAINT CK_san_pham_status
-        CHECK (status IN ('ACTIVE', 'INACTIVE'))
+    name VARCHAR(150) NOT NULL,
+    author VARCHAR(150),
+    publisher VARCHAR(150),
+    description CLOB,
+    price DECIMAL(18,2) NOT NULL DEFAULT 0,
+    image VARCHAR(500),
+    quantity INT NOT NULL DEFAULT 0,
+    views INT NOT NULL DEFAULT 0,
+    sold INT NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_books_categories FOREIGN KEY (category_id) REFERENCES categories(id)
 );
-GO
-CREATE TABLE gio_hang (
-    id INT IDENTITY(1,1) PRIMARY KEY,
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    created_at DATETIME2 DEFAULT SYSDATETIME(),
-    updated_at DATETIME2 DEFAULT SYSDATETIME(),
-
-    CONSTRAINT FK_gio_hang_users
-        FOREIGN KEY (user_id) REFERENCES users(id),
-
-    CONSTRAINT FK_gio_hang_san_pham
-        FOREIGN KEY (product_id) REFERENCES san_pham(id),
-
-    CONSTRAINT CK_gio_hang_quantity_positive
-        CHECK (quantity > 0),
-
-    CONSTRAINT UQ_gio_hang_user_product
-        UNIQUE (user_id, product_id)
-);
-GO
-CREATE TABLE hoa_don (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT NOT NULL,
-    receiver_name NVARCHAR(100) NOT NULL,
-    receiver_phone NVARCHAR(20) NOT NULL,
-    receiver_address NVARCHAR(255) NOT NULL,
-    note NVARCHAR(500),
+    receiver_name VARCHAR(100) NOT NULL,
+    receiver_phone VARCHAR(20) NOT NULL,
+    receiver_address VARCHAR(255) NOT NULL,
+    note VARCHAR(500),
     total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
-    payment_method NVARCHAR(20) NOT NULL DEFAULT 'COD',
-    order_status NVARCHAR(20) NOT NULL DEFAULT 'PENDING',
-    created_at DATETIME2 DEFAULT SYSDATETIME(),
-    updated_at DATETIME2 DEFAULT SYSDATETIME(),
-
-    CONSTRAINT FK_hoa_don_users
-        FOREIGN KEY (user_id) REFERENCES users(id),
-
-    CONSTRAINT CK_hoa_don_total_amount
-        CHECK (total_amount >= 0),
-
-    CONSTRAINT CK_hoa_don_payment_method
-        CHECK (payment_method IN ('COD', 'ONLINE')), -- Mở rộng thêm thanh toán Online nếu cần
-
-    CONSTRAINT CK_hoa_don_order_status
-        CHECK (order_status IN (
-            'PENDING',
-            'CONFIRMED',
-            'SHIPPING',
-            'FINISH',
-            'CANCELLED'
-        ))
+    payment_method VARCHAR(20) NOT NULL DEFAULT 'COD',
+    order_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_orders_users FOREIGN KEY (user_id) REFERENCES users(id)
 );
-GO
-CREATE TABLE hoa_don_chi_tiet (
-    id INT IDENTITY(1,1) PRIMARY KEY,
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     invoice_id INT NOT NULL,
     product_id INT NOT NULL,
-    product_name NVARCHAR(150) NOT NULL,
-    product_image NVARCHAR(500),
+    product_name VARCHAR(150) NOT NULL,
+    product_image VARCHAR(500),
     price_at_purchase DECIMAL(18,2) NOT NULL,
     quantity INT NOT NULL,
     line_total DECIMAL(18,2) NOT NULL,
-
-    CONSTRAINT FK_hoa_don_chi_tiet_hoa_don
-        FOREIGN KEY (invoice_id) REFERENCES hoa_don(id),
-
-    CONSTRAINT FK_hoa_don_chi_tiet_san_pham
-        FOREIGN KEY (product_id) REFERENCES san_pham(id),
-
-    CONSTRAINT CK_hoa_don_chi_tiet_price_non_negative
-        CHECK (price_at_purchase >= 0),
-
-    CONSTRAINT CK_hoa_don_chi_tiet_quantity_positive
-        CHECK (quantity > 0),
-
-    CONSTRAINT CK_hoa_don_chi_tiet_line_total_non_negative
-        CHECK (line_total >= 0)
+    CONSTRAINT FK_order_items_orders FOREIGN KEY (invoice_id) REFERENCES orders(id)
 );
-GO
-INSERT INTO users(full_name, email, password_hash, phone, address, role, status)
-VALUES
-(N'Bùi Văn Đức', 'buivanduc1508@gmail.com', '123654', '0904415459', N'Hải Phòng', 'ADMIN', 'ACTIVE'),
-(N'Nguyễn Danh Nhật Lâm', 'dokhanh020906@gmail.com', '123890', '0386550664', N'Cát Bà, Hải Phòng', 'CUSTOMER', 'ACTIVE'),
-(N'Trần Thị Phương Nhung', 'phuongnhung14052007@gmail.com', '123789', '0782159754', N'Lê Chân, Hải Phòng', 'CUSTOMER', 'ACTIVE'),
-(N'Lương Xuân Tiến', 'xuanatien@gmail.com', '123456', '0867054901', N'Hải Phòng', 'CUSTOMER', 'ACTIVE');
-Go
-INSERT INTO danh_muc(name, description, status)
-VALUES
-(N'Sách Giáo Khoa & Giáo Trình', N'Sách phục vụ học tập, giảng dạy tại các cấp học và đại học', 'ACTIVE'),
-(N'Truyện Tranh & Manga', N'Truyện tranh giải trí trong và ngoài nước', 'ACTIVE'),
-(N'Sách Văn Học & Tiểu Thuyết', N'Tác phẩm văn học kinh điển, tiểu thuyết hiện đại', 'ACTIVE'),
-(N'Sách Kỹ Năng & Phát Triển Bản Thân', N'Sách hướng dẫn kỹ năng sống, tư duy, kinh doanh', 'ACTIVE');
-GO
-INSERT INTO san_pham(category_id, name, description, price, image, quantity, status)
-VALUES
-(1, N'Giáo Trình Lập Trình Java Spring Boot', N'Hướng dẫn chi tiết từ cơ bản đến nâng cao về phát triển Web với Spring Boot.', 150000, 'https://placehold.co/book-spring.jpg', 15, 'ACTIVE'),
-(1, N'Cấu Trúc Dữ Liệu Và Giải Thuật', N'Sách nền tảng cho mọi lập trình viên tư duy thuật toán.', 120000, 'https://placehold.co/book-ctdl.jpg', 20, 'ACTIVE'),
-(2, N'Thám Tử Lừng Danh Conan - Tập 100', N'Ấn bản đặc biệt đánh dấu cột mốc tập thứ 100 của bộ truyện huyền thoại.', 30000, 'https://placehold.co/book-conan.jpg', 50, 'ACTIVE'),
-(2, N'One Piece - Tập 101', N'Hành trình chinh phục kho báu vĩ đại của băng Mũ Rơm tại Wano Quốc.', 35000, 'https://placehold.co/book-onepiece.jpg', 40, 'ACTIVE'),
-(3, N'Nhà Giả Kim', N'Cuốn sách thúc giục người đọc theo đuổi giấc mơ của cuộc đời mình.', 79000, 'https://placehold.co/book-nhagiakim.jpg', 30, 'ACTIVE'),
-(3, N'Mắt Biếc', N'Tác phẩm văn học lãng mạn, sâu lắng của nhà văn Nguyễn Nhật Ánh.', 110000, 'https://placehold.co/book-matbiec.jpg', 12, 'ACTIVE'),
-(4, N'Đắc Nhân Tâm', N'Cuốn sách nghệ thuật ứng xử hàng đầu mọi thời đại.', 86000, 'https://placehold.co/book-dacnhantam.jpg', 25, 'ACTIVE'),
-(4, N'Thay Đổi Tí Hon Hiệu Quả Bất Ngờ', N'Cách xây dựng thói quen tốt và loại bỏ thói quen xấu một cách khoa học.', 145000, 'https://placehold.co/book-atomic-habits.jpg', 18, 'ACTIVE');
-GO
-INSERT INTO hoa_don(
-    user_id,
-    receiver_name,
-    receiver_phone,
-    receiver_address,
-    note,
-    total_amount,
-    payment_method,
-    order_status
-)
-VALUES
-(2, N'Bùi Văn Đức', '0904415459', N'Đông Hải, Hải Phòng', N'Giao giờ hành chính, gọi trước 15 phút', 300000, 'COD', 'PENDING'),
-(3, N'Trần Thị Phương Nhung', '0782159754', N'Cát Bà, Hải Phòng', N'Để ở bảo vệ nếu không gọi được', 65000, 'COD', 'CONFIRMED');
-GO
-INSERT INTO hoa_don_chi_tiet(
-    invoice_id,
-    product_id,
-    product_name,
-    product_image,
-    price_at_purchase,
-    quantity,
-    line_total
-)
-VALUES
-(1, 1, N'Giáo Trình Lập Trình Java Spring Boot', 'https://placehold.co/book-spring.jpg', 150000, 2, 300000),
-(2, 3, N'Thám Tử Lừng Danh Conan - Tập 100', 'https://placehold.co/book-conan.jpg', 30000, 1, 30000),
-(2, 4, N'One Piece - Tập 101', 'https://placehold.co/book-onepiece.jpg', 35000, 1, 35000);
-GO
-UPDATE san_pham
-SET quantity = quantity - 1
-WHERE id = 3 AND quantity >= 1;
-UPDATE san_pham
-SET quantity = quantity - 1
-WHERE id = 4 AND quantity >= 1;
-GO
-SELECT * FROM users;
-SELECT * FROM danh_muc;
-SELECT * FROM san_pham;
-SELECT * FROM gio_hang;
-SELECT * FROM hoa_don;
-SELECT * FROM hoa_don_chi_tiet;
-GO
+
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    book_id INT NOT NULL,
+    user_name VARCHAR(100) NOT NULL,
+    rating INT NOT NULL,
+    content VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS favorites (
+    user_id INT NOT NULL,
+    book_id INT NOT NULL,
+    PRIMARY KEY (user_id, book_id)
+);
+
+CREATE TABLE IF NOT EXISTS danh_muc (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS san_pham (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    description CLOB,
+    price DECIMAL(18,2) NOT NULL DEFAULT 0,
+    image VARCHAR(500),
+    quantity INT NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

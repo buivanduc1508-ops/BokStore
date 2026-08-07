@@ -58,7 +58,8 @@ final class StoreDatabase {
         return true;
       }
     } catch (Exception e) {
-      throw new IllegalStateException("Không thể đọc database H2", e);
+      System.err.println("Cảnh báo: Không thể đọc snapshot cũ từ H2 DB (" + e.getMessage() + "). Ứng dụng sẽ nạp dữ liệu khởi tạo chuẩn.");
+      return false;
     }
   }
 

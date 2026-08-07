@@ -1,5 +1,5 @@
 <%@ page import="java.util.*,model.*" %>
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="true" %>
 <%!
 private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
   String image = book == null || book.getImage() == null ? "" : book.getImage().trim();

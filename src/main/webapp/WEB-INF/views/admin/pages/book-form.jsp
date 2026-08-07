@@ -17,6 +17,7 @@
   </header>
   <section class="admin-form-card">
     <form class="form-grid" method="post" action="<%=request.getContextPath()%>/admin/manage">
+      <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
       <input type="hidden" name="tab" value="books">
       <input type="hidden" name="type" value="book">
       <input type="hidden" name="id" value="<%=b==null?0:b.getId()%>">
@@ -33,7 +34,7 @@
         <input name="publisher" required value="<%=b==null?"":b.getPublisher()%>">
       </label>
       <label>
-        Giá bán
+        Giá bán (VNĐ)
         <input name="price" type="number" min="0" required value="<%=b==null?0:b.getPrice()%>">
       </label>
       <label>
@@ -43,23 +44,20 @@
       <label>
         Danh mục
         <select name="categoryId">
-          <%for(Category c:cats){%>
-            <option value="<%=c.getId()%>" <%=b!=null&&b.getCategoryId()==c.getId()?"selected":""%>
-              >
-              <%=c.getName()%>
-            </option>
+          <%if(cats!=null&&!cats.isEmpty()){for(Category c:cats){%>
+            <option value="<%=c.getId()%>" <%=b!=null&&b.getCategoryId()==c.getId()?"selected":""%>><%=c.getName()%></option>
+          <%}}else{%>
+            <option value="1">Mặc định / Văn học</option>
           <%}%>
         </select>
       </label>
       <label>
         Đường dẫn ảnh
-        <input name="image" value="<%=b==null?"":b.getImage()%>">
+        <input name="image" placeholder="https://placehold.co/400x600/..." value="<%=b==null?"":b.getImage()%>">
       </label>
       <label>
         Mô tả
-        <textarea name="description" required>
-          <%=b==null?"":b.getDescription()%>
-        </textarea>
+        <textarea name="description" required><%=b==null?"":b.getDescription().trim()%></textarea>
       </label>
       <button>
         Lưu sản phẩm
@@ -68,6 +66,7 @@
     <%if(b!=null){%>
       <hr>
       <form class="inline-form" method="post" action="<%=request.getContextPath()%>/admin/manage">
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
         <input type="hidden" name="tab" value="books">
         <input type="hidden" name="type" value="book">
         <input type="hidden" name="action" value="stock">

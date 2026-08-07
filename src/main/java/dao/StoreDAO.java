@@ -35,7 +35,7 @@ public final class StoreDAO {
             "Paulo Coelho",
             "Nhã Nam",
             79000,
-            "",
+            "https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim",
             "Hành trình theo đuổi ước mơ.",
             1,
             20));
@@ -46,7 +46,7 @@ public final class StoreDAO {
             "Dale Carnegie",
             "Tổng hợp",
             86000,
-            "",
+            "https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam",
             "Nghệ thuật giao tiếp và ứng xử.",
             2,
             16));
@@ -57,7 +57,7 @@ public final class StoreDAO {
             "Robert C. Martin",
             "Pearson",
             245000,
-            "",
+            "https://placehold.co/400x600/2b2d42/ffffff?text=Clean+Code",
             "Cẩm nang viết mã nguồn sạch.",
             3,
             8));
@@ -68,7 +68,7 @@ public final class StoreDAO {
             "Rosie Nguyễn",
             "Hội Nhà Văn",
             90000,
-            "",
+            "https://placehold.co/400x600/e76f51/ffffff?text=Tuoi+Tre",
             "Sách truyền cảm hứng cho người trẻ.",
             2,
             12));
@@ -79,7 +79,7 @@ public final class StoreDAO {
             "Tô Hoài",
             "Kim Đồng",
             65000,
-            "",
+            "https://placehold.co/400x600/e9c46a/ffffff?text=De+Men",
             "Tác phẩm văn học thiếu nhi kinh điển.",
             1,
             25));
@@ -90,7 +90,7 @@ public final class StoreDAO {
             "Cay Horstmann",
             "Pearson",
             320000,
-            "",
+            "https://placehold.co/400x600/1d3557/ffffff?text=Java+Core",
             "Nền tảng lập trình Java.",
             3,
             5));
@@ -186,13 +186,15 @@ public final class StoreDAO {
             b ->
                 q == null
                     || q.isBlank()
-                    || (b.getName() + " " + b.getAuthor()).toLowerCase().contains(q.toLowerCase()))
+                    || ((b.getName() == null ? "" : b.getName()) + " " + (b.getAuthor() == null ? "" : b.getAuthor()))
+                        .toLowerCase()
+                        .contains(q.toLowerCase()))
         .filter(b -> category == 0 || b.getCategoryId() == category)
         .filter(
             b ->
                 publisher == null
                     || publisher.isBlank()
-                    || b.getPublisher().equalsIgnoreCase(publisher))
+                    || (b.getPublisher() != null && b.getPublisher().equalsIgnoreCase(publisher)))
         .filter(
             b ->
                 availability == null
@@ -219,6 +221,12 @@ public final class StoreDAO {
       String description,
       int category,
       int stock) {
+    if (image == null || image.isBlank()) {
+      image = "https://placehold.co/400x600/2b2d42/ffffff?text=" + (name == null || name.isBlank() ? "Book" : name.replaceAll("\\s+", "+"));
+    }
+    if (category <= 0 && !categories.isEmpty()) {
+      category = categories.get(0).getId();
+    }
     Book b = book(id);
     if (b == null) {
       b =

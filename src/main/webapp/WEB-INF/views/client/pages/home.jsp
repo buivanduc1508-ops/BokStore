@@ -73,102 +73,102 @@
   <div class="bok-slider-track">
     <!-- Danh sách sản phẩm từ Database (Lần 1) -->
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-spring.jpg" alt="Giáo Trình Lập Trình Java Spring Boot" />
+      <img src="https://placehold.co/400x600/2b2d42/ffffff?text=Java+Spring" alt="Giáo Trình Lập Trình Java Spring Boot" />
       <h3>Giáo Trình Lập Trình Java Spring Boot</h3>
       <p class="price">150.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=1">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=1">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-ctdl.jpg" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
+      <img src="https://placehold.co/400x600/1d3557/ffffff?text=Data+Structures" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
       <h3>Cấu Trúc Dữ Liệu Và Giải Thuật</h3>
       <p class="price">120.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=2">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=2">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-conan.jpg" alt="Thám Tử Lừng Danh Conan - Tập 100" />
+      <img src="https://placehold.co/400x600/457b9d/ffffff?text=Conan+100" alt="Thám Tử Lừng Danh Conan - Tập 100" />
       <h3>Thám Tử Lừng Danh Conan - Tập 100</h3>
       <p class="price">30.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=3">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=3">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-onepiece.jpg" alt="One Piece - Tập 101" />
+      <img src="https://placehold.co/400x600/e63946/ffffff?text=One+Piece+101" alt="One Piece - Tập 101" />
       <h3>One Piece - Tập 101</h3>
       <p class="price">35.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=4">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=4">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-nhagiakim.jpg" alt="Nhà Giả Kim" />
+      <img src="https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim" alt="Nhà Giả Kim" />
       <h3>Nhà Giả Kim</h3>
       <p class="price">79.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=5">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=5">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-matbiec.jpg" alt="Mắt Biếc" />
+      <img src="https://placehold.co/400x600/e9c46a/ffffff?text=Mat+Biec" alt="Mắt Biếc" />
       <h3>Mắt Biếc</h3>
       <p class="price">110.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=6">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=6">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-dacnhantam.jpg" alt="Đắc Nhân Tâm" />
+      <img src="https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam" alt="Đắc Nhân Tâm" />
       <h3>Đắc Nhân Tâm</h3>
       <p class="price">86.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=7">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=7">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-atomic-habits.jpg" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
+      <img src="https://placehold.co/400x600/e76f51/ffffff?text=Atomic+Habits" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
       <h3>Thay Đổi Tí Hon Hiệu Quả Bất Ngờ</h3>
       <p class="price">145.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=8">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=8">Xem chi tiết</a>
     </div>
 
     <!-- Duplicate dữ liệu để vòng lặp hiệu ứng trượt mượt mà -->
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-spring.jpg" alt="Giáo Trình Lập Trình Java Spring Boot" />
+      <img src="https://placehold.co/400x600/2b2d42/ffffff?text=Java+Spring" alt="Giáo Trình Lập Trình Java Spring Boot" />
       <h3>Giáo Trình Lập Trình Java Spring Boot</h3>
       <p class="price">150.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=1">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=1">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-ctdl.jpg" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
+      <img src="https://placehold.co/400x600/1d3557/ffffff?text=Data+Structures" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
       <h3>Cấu Trúc Dữ Liệu Và Giải Thuật</h3>
       <p class="price">120.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=2">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=2">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-conan.jpg" alt="Thám Tử Lừng Danh Conan - Tập 100" />
+      <img src="https://placehold.co/400x600/457b9d/ffffff?text=Conan+100" alt="Thám Tử Lừng Danh Conan - Tập 100" />
       <h3>Thám Tử Lừng Danh Conan - Tập 100</h3>
       <p class="price">30.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=3">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=3">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-onepiece.jpg" alt="One Piece - Tập 101" />
+      <img src="https://placehold.co/400x600/e63946/ffffff?text=One+Piece+101" alt="One Piece - Tập 101" />
       <h3>One Piece - Tập 101</h3>
       <p class="price">35.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=4">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=4">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-nhagiakim.jpg" alt="Nhà Giả Kim" />
+      <img src="https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim" alt="Nhà Giả Kim" />
       <h3>Nhà Giả Kim</h3>
       <p class="price">79.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=5">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=5">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-matbiec.jpg" alt="Mắt Biếc" />
+      <img src="https://placehold.co/400x600/e9c46a/ffffff?text=Mat+Biec" alt="Mắt Biếc" />
       <h3>Mắt Biếc</h3>
       <p class="price">110.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=6">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=6">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-dacnhantam.jpg" alt="Đắc Nhân Tâm" />
+      <img src="https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam" alt="Đắc Nhân Tâm" />
       <h3>Đắc Nhân Tâm</h3>
       <p class="price">86.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=7">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=7">Xem chi tiết</a>
     </div>
     <div class="bok-slide-card">
-      <img src="https://placehold.co/book-atomic-habits.jpg" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
+      <img src="https://placehold.co/400x600/e76f51/ffffff?text=Atomic+Habits" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
       <h3>Thay Đổi Tí Hon Hiệu Quả Bất Ngờ</h3>
       <p class="price">145.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/product-detail?id=8">Xem chi tiết</a>
+      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=8">Xem chi tiết</a>
     </div>
   </div>
 </div>
