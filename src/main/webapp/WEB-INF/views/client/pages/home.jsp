@@ -119,36 +119,89 @@ if (newBooks.isEmpty() && allBooks.isEmpty()) {
     <section class="mot-panel">
       <div class="mot-category-header">
         <h2>S&aacute;ch theo t&#7915;ng th&#7875; lo&#7841;i</h2>
-        <ul class="mot-tabs">
+        <ul class="mot-tabs" data-category-tabs>
           <% for (int i = 0; i < Math.min(3, categories.size()); i++) { Category category = categories.get(i); %>
-            <li class="<%=i == 0 ? "active" : ""%>"><a href="<%=request.getContextPath()%>/shop?category=<%=category.getId()%>"><%=category.getName()%></a></li>
+            <li class="<%=i == 0 ? "active" : ""%>">
+              <button type="button" data-category-tab="<%=category.getId()%>" aria-selected="<%=i == 0 ? "true" : "false"%>"><%=category.getName()%></button>
+            </li>
           <% } %>
         </ul>
       </div>
-      <div class="mot-grid-2">
-        <%
-        List<Book> categoryBooks = categories.isEmpty() ? allBooks.stream().limit(8).toList() : byCategory(allBooks, categories.get(0).getId(), 8);
-        for (Book book : categoryBooks) { String img = imageSrc(request, book);
-        %>
-          <article class="mot-card horizontal-card">
-            <div class="card-inner">
-              <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
-                <% if (!img.isEmpty()) { %>
-                  <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
-                <% } else { %>
-                  <span class="mot-cover-fallback small"><%=book.getName().substring(0, 1)%></span>
-                <% } %>
-              </a>
-              <div class="horizontal-info">
-                <h4><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h4>
-                <p class="mot-author"><%=book.getAuthor()%></p>
-                <strong class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</strong>
-                <p class="desc"><%=book.getDescription()%></p>
-              </div>
+      <div class="mot-category-panels">
+        <% if (categories.isEmpty()) { %>
+          <div class="mot-grid-2 category-panel active">
+            <% for (Book book : allBooks.stream().limit(8).toList()) { String img = imageSrc(request, book); %>
+              <article class="mot-card horizontal-card">
+                <div class="card-inner">
+                  <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
+                    <% if (!img.isEmpty()) { %>
+                      <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
+                    <% } else { %>
+                      <span class="mot-cover-fallback small"><%=book.getName().substring(0, 1)%></span>
+                    <% } %>
+                  </a>
+                  <div class="horizontal-info">
+                    <h4><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h4>
+                    <p class="mot-author"><%=book.getAuthor()%></p>
+                    <strong class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</strong>
+                    <p class="desc"><%=book.getDescription()%></p>
+                  </div>
+                </div>
+              </article>
+            <% } %>
+          </div>
+        <% } else { %>
+          <% for (int i = 0; i < Math.min(3, categories.size()); i++) {
+            Category category = categories.get(i);
+            List<Book> categoryBooks = byCategory(allBooks, category.getId(), 8);
+          %>
+            <div class="mot-grid-2 category-panel <%=i == 0 ? "active" : ""%>" data-category-panel="<%=category.getId()%>">
+              <% for (Book book : categoryBooks) { String img = imageSrc(request, book); %>
+                <article class="mot-card horizontal-card">
+                  <div class="card-inner">
+                    <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
+                      <% if (!img.isEmpty()) { %>
+                        <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
+                      <% } else { %>
+                        <span class="mot-cover-fallback small"><%=book.getName().substring(0, 1)%></span>
+                      <% } %>
+                    </a>
+                    <div class="horizontal-info">
+                      <h4><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h4>
+                      <p class="mot-author"><%=book.getAuthor()%></p>
+                      <strong class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</strong>
+                      <p class="desc"><%=book.getDescription()%></p>
+                    </div>
+                  </div>
+                </article>
+              <% } %>
+              <% if (categoryBooks.isEmpty()) { %>
+                <p class="empty-state">Ch&#432;a c&oacute; s&aacute;ch trong th&#7875; lo&#7841;i n&agrave;y.</p>
+              <% } %>
             </div>
-          </article>
+          <% } %>
         <% } %>
       </div>
     </section>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll('[data-category-tabs]').forEach(function(tabList) {
+    var tabs = tabList.querySelectorAll('[data-category-tab]');
+    var panels = document.querySelectorAll('[data-category-panel]');
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var categoryId = tab.getAttribute('data-category-tab');
+        tabs.forEach(function(item) {
+          var selected = item === tab;
+          item.setAttribute('aria-selected', selected ? 'true' : 'false');
+          item.closest('li').classList.toggle('active', selected);
+        });
+        panels.forEach(function(panel) {
+          panel.classList.toggle('active', panel.getAttribute('data-category-panel') === categoryId);
+        });
+      });
+    });
+  });
+</script>

@@ -161,22 +161,44 @@
     margin: 0;
     padding: 0;
 }
-.mot-tabs li a {
+.mot-tabs li a,
+.mot-tabs li button {
     text-decoration: none;
     font-size: 13px;
     color: #666;
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+    padding: 0 0 5px;
+    box-shadow: none;
+    cursor: pointer;
 }
-.mot-tabs li.active a {
+.mot-tabs li a:hover,
+.mot-tabs li button:hover {
+    transform: none;
+    box-shadow: none;
+    background: transparent;
+    color: #d9251d;
+}
+.mot-tabs li.active a,
+.mot-tabs li.active button {
     color: #d9251d;
     font-weight: 700;
     border-bottom: 2px solid #d9251d;
-    padding-bottom: 5px;
 }
 
 .mot-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
+}
+
+.mot-grid-2.category-panel {
+    display: none;
+}
+
+.mot-grid-2.category-panel.active {
+    display: grid;
 }
 
 .horizontal-card .card-inner {
