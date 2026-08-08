@@ -1,6 +1,5 @@
 package dao;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -25,11 +24,17 @@ final class StoreDatabase {
   }
 
   private void initialize() {
-    String sql = "CREATE TABLE IF NOT EXISTS app_state (id INT PRIMARY KEY, payload BLOB NOT NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
-    try (Connection connection = ConnectDB.getConnect(); Statement statement = connection.createStatement()) {
+    String sql =
+        "IF OBJECT_ID('dbo.app_state', 'U') IS NULL "
+            + "CREATE TABLE dbo.app_state ("
+            + "id INT PRIMARY KEY, "
+            + "payload VARBINARY(MAX) NOT NULL, "
+            + "updated_at DATETIME2 DEFAULT SYSDATETIME())";
+    try (Connection connection = ConnectDB.getConnect();
+        Statement statement = connection.createStatement()) {
       statement.execute(sql);
     } catch (Exception e) {
-      throw new IllegalStateException("Không thể khởi tạo database H2", e);
+      throw new IllegalStateException("Khong the khoi tao database SQL Server", e);
     }
   }
 
@@ -43,7 +48,8 @@ final class StoreDatabase {
       Map<Integer, Set<Integer>> favorites,
       Map<Integer, String> avatars) {
     try (Connection connection = ConnectDB.getConnect();
-        PreparedStatement statement = connection.prepareStatement("SELECT payload FROM app_state WHERE id = 1");
+        PreparedStatement statement =
+            connection.prepareStatement("SELECT payload FROM dbo.app_state WHERE id = 1");
         ResultSet result = statement.executeQuery()) {
       if (!result.next()) return false;
       try (ObjectInputStream input = new ObjectInputStream(result.getBinaryStream(1))) {
@@ -58,8 +64,56 @@ final class StoreDatabase {
         return true;
       }
     } catch (Exception e) {
-      System.err.println("Cảnh báo: Không thể đọc snapshot cũ từ H2 DB (" + e.getMessage() + "). Ứng dụng sẽ nạp dữ liệu khởi tạo chuẩn.");
-      return false;
+      throw new IllegalStateException("Khong the doc database SQL Server", e);
+    }
+  }
+
+  boolean mergeSqlCatalog(List<Category> categories, List<Book> books) {
+    try (Connection connection = ConnectDB.getConnect()) {
+      if (!tableExists(connection, "danh_muc") || !tableExists(connection, "san_pham")) {
+        return false;
+      }
+
+      boolean changed = !categories.isEmpty() || !books.isEmpty();
+      categories.clear();
+      books.clear();
+
+      try (PreparedStatement statement =
+              connection.prepareStatement("SELECT id, name, status FROM dbo.danh_muc ORDER BY id");
+          ResultSet result = statement.executeQuery()) {
+        while (result.next()) {
+          Category category = new Category(result.getInt("id"), result.getString("name"));
+          category.setDeleted(!"ACTIVE".equalsIgnoreCase(result.getString("status")));
+          categories.add(category);
+          changed = true;
+        }
+      }
+
+      try (PreparedStatement statement =
+              connection.prepareStatement(
+                  "SELECT id, category_id, name, description, price, image, quantity, status "
+                      + "FROM dbo.san_pham ORDER BY id");
+          ResultSet result = statement.executeQuery()) {
+        while (result.next()) {
+          Book book =
+              new Book(
+                  result.getInt("id"),
+                  result.getString("name"),
+                  "Dang cap nhat",
+                  "BokStore",
+                  result.getBigDecimal("price").longValue(),
+                  safe(result.getString("image")),
+                  safe(result.getString("description")),
+                  result.getInt("category_id"),
+                  result.getInt("quantity"));
+          book.setDeleted(!"ACTIVE".equalsIgnoreCase(result.getString("status")));
+          books.add(book);
+          changed = true;
+        }
+      }
+      return changed;
+    } catch (Exception e) {
+      throw new IllegalStateException("Khong the dong bo san_pham tu SQL Server", e);
     }
   }
 
@@ -72,19 +126,23 @@ final class StoreDatabase {
       Map<Integer, Set<Integer>> favorites,
       Map<Integer, String> avatars) {
     Snapshot snapshot =
-        new Snapshot(List.copyOf(categories), List.copyOf(books), List.copyOf(users),
-            List.copyOf(orders), List.copyOf(reviews), Map.copyOf(favorites), Map.copyOf(avatars));
+        new Snapshot(
+            List.copyOf(categories),
+            List.copyOf(books),
+            List.copyOf(users),
+            List.copyOf(orders),
+            List.copyOf(reviews),
+            Map.copyOf(favorites),
+            Map.copyOf(avatars));
     try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream output = new ObjectOutputStream(bytes)) {
       output.writeObject(snapshot);
       output.flush();
       try (Connection connection = ConnectDB.getConnect()) {
         connection.setAutoCommit(false);
-        try (PreparedStatement statement =
-            connection.prepareStatement(
-                "MERGE INTO app_state (id, payload, updated_at) KEY(id) VALUES (1, ?, CURRENT_TIMESTAMP)")) {
-          statement.setBytes(1, bytes.toByteArray());
-          statement.executeUpdate();
+        try {
+          saveAppState(connection, bytes.toByteArray());
+          syncSqlCatalog(connection, categories, books);
           connection.commit();
         } catch (Exception e) {
           connection.rollback();
@@ -92,8 +150,134 @@ final class StoreDatabase {
         }
       }
     } catch (Exception e) {
-      throw new IllegalStateException("Không thể lưu database H2", e);
+      throw new IllegalStateException("Khong the luu database SQL Server", e);
     }
+  }
+
+  private void saveAppState(Connection connection, byte[] payload) throws Exception {
+    try (PreparedStatement update =
+        connection.prepareStatement(
+            "UPDATE dbo.app_state SET payload = ?, updated_at = SYSDATETIME() WHERE id = 1")) {
+      update.setBytes(1, payload);
+      if (update.executeUpdate() > 0) return;
+    }
+    try (PreparedStatement insert =
+        connection.prepareStatement(
+            "INSERT INTO dbo.app_state (id, payload, updated_at) VALUES (1, ?, SYSDATETIME())")) {
+      insert.setBytes(1, payload);
+      insert.executeUpdate();
+    }
+  }
+
+  private void syncSqlCatalog(Connection connection, List<Category> categories, List<Book> books)
+      throws Exception {
+    if (!tableExists(connection, "danh_muc") || !tableExists(connection, "san_pham")) {
+      return;
+    }
+    syncCategories(connection, categories);
+    syncBooks(connection, books);
+  }
+
+  private void syncCategories(Connection connection, List<Category> categories) throws Exception {
+    boolean identity = hasIdentityId(connection, "danh_muc");
+    if (identity) setIdentityInsert(connection, "danh_muc", true);
+    try {
+      for (Category category : categories) {
+        try (PreparedStatement update =
+            connection.prepareStatement(
+                "UPDATE dbo.danh_muc SET name = ?, status = ? WHERE id = ?")) {
+          update.setString(1, category.getName());
+          update.setString(2, category.isDeleted() ? "INACTIVE" : "ACTIVE");
+          update.setInt(3, category.getId());
+          if (update.executeUpdate() > 0) continue;
+        }
+        try (PreparedStatement insert =
+            connection.prepareStatement(
+                "INSERT INTO dbo.danh_muc (id, name, description, status) VALUES (?, ?, ?, ?)")) {
+          insert.setInt(1, category.getId());
+          insert.setString(2, category.getName());
+          insert.setString(3, "");
+          insert.setString(4, category.isDeleted() ? "INACTIVE" : "ACTIVE");
+          insert.executeUpdate();
+        }
+      }
+    } finally {
+      if (identity) setIdentityInsert(connection, "danh_muc", false);
+    }
+  }
+
+  private void syncBooks(Connection connection, List<Book> books) throws Exception {
+    boolean identity = hasIdentityId(connection, "san_pham");
+    if (identity) setIdentityInsert(connection, "san_pham", true);
+    try {
+      for (Book book : books) {
+        try (PreparedStatement update =
+            connection.prepareStatement(
+                "UPDATE dbo.san_pham SET category_id = ?, name = ?, description = ?, price = ?, "
+                    + "image = ?, quantity = ?, status = ? WHERE id = ?")) {
+          update.setInt(1, book.getCategoryId());
+          update.setString(2, book.getName());
+          update.setString(3, book.getDescription());
+          update.setLong(4, book.getPrice());
+          update.setString(5, book.getImage());
+          update.setInt(6, book.getStock());
+          update.setString(7, book.isDeleted() ? "INACTIVE" : "ACTIVE");
+          update.setInt(8, book.getId());
+          if (update.executeUpdate() > 0) continue;
+        }
+        try (PreparedStatement insert =
+            connection.prepareStatement(
+                "INSERT INTO dbo.san_pham "
+                    + "(id, category_id, name, description, price, image, quantity, status) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+          insert.setInt(1, book.getId());
+          insert.setInt(2, book.getCategoryId());
+          insert.setString(3, book.getName());
+          insert.setString(4, book.getDescription());
+          insert.setLong(5, book.getPrice());
+          insert.setString(6, book.getImage());
+          insert.setInt(7, book.getStock());
+          insert.setString(8, book.isDeleted() ? "INACTIVE" : "ACTIVE");
+          insert.executeUpdate();
+        }
+      }
+    } finally {
+      if (identity) setIdentityInsert(connection, "san_pham", false);
+    }
+  }
+
+  private boolean tableExists(Connection connection, String tableName) throws Exception {
+    try (PreparedStatement statement =
+        connection.prepareStatement(
+            "SELECT 1 FROM INFORMATION_SCHEMA.TABLES "
+                + "WHERE TABLE_SCHEMA = 'dbo' AND LOWER(TABLE_NAME) = LOWER(?)")) {
+      statement.setString(1, tableName);
+      try (ResultSet result = statement.executeQuery()) {
+        return result.next();
+      }
+    }
+  }
+
+  private boolean hasIdentityId(Connection connection, String tableName) throws Exception {
+    try (PreparedStatement statement =
+        connection.prepareStatement(
+            "SELECT COLUMNPROPERTY(OBJECT_ID('dbo.' + ?), 'id', 'IsIdentity')")) {
+      statement.setString(1, tableName);
+      try (ResultSet result = statement.executeQuery()) {
+        return result.next() && result.getInt(1) == 1;
+      }
+    }
+  }
+
+  private void setIdentityInsert(Connection connection, String tableName, boolean enabled)
+      throws Exception {
+    try (Statement statement = connection.createStatement()) {
+      statement.execute("SET IDENTITY_INSERT dbo." + tableName + (enabled ? " ON" : " OFF"));
+    }
+  }
+
+  private String safe(String value) {
+    return value == null ? "" : value;
   }
 
   private static final class Snapshot implements Serializable {
@@ -106,8 +290,14 @@ final class StoreDatabase {
     final Map<Integer, Set<Integer>> favorites;
     final Map<Integer, String> avatars;
 
-    Snapshot(List<Category> categories, List<Book> books, List<User> users, List<Order> orders,
-        List<Review> reviews, Map<Integer, Set<Integer>> favorites, Map<Integer, String> avatars) {
+    Snapshot(
+        List<Category> categories,
+        List<Book> books,
+        List<User> users,
+        List<Order> orders,
+        List<Review> reviews,
+        Map<Integer, Set<Integer>> favorites,
+        Map<Integer, String> avatars) {
       this.categories = categories;
       this.books = books;
       this.users = users;

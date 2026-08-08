@@ -1,224 +1,147 @@
+<%@ page import="java.util.*,model.*,dao.StoreDAO" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!-- ================= PHẦN THÊM MỚI: SLIDER CHUYỂN CẢNH ================= -->
-<style>
-  .bok-slider-wrapper {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    background-color: #e8f0fe;
-    padding: 40px 0;
+<%!
+private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
+  String image = book == null || book.getImage() == null ? "" : book.getImage().trim();
+  if (image.isEmpty()
+      || image.startsWith("http://")
+      || image.startsWith("https://")
+      || image.startsWith("/")
+      || image.startsWith("data:")) {
+    return image;
   }
+  return request.getContextPath() + "/" + image;
+}
 
-  .bok-slider-track {
-    display: flex;
-    width: calc(320px * 16); /* Nhân đôi độ dài danh sách để chạy lặp vô tận */
-    animation: scrollLeft 30s linear infinite;
+private List<Book> byCategory(List<Book> books, int categoryId, int limit) {
+  List<Book> filtered = new ArrayList<>();
+  for (Book book : books) {
+    if (book.getCategoryId() == categoryId && !book.isDeleted()) filtered.add(book);
+    if (filtered.size() == limit) break;
   }
+  return filtered;
+}
+%>
+<%
+List<Book> newBooks = (List<Book>) request.getAttribute("newBooks");
+List<Book> topBooks = (List<Book>) request.getAttribute("topBooks");
+List<Category> categories = (List<Category>) request.getAttribute("categories");
+List<Book> allBooks = (List<Book>) request.getAttribute("allBooks");
+if (newBooks == null) newBooks = List.of();
+if (topBooks == null) topBooks = List.of();
+if (categories == null) categories = List.of();
+if (allBooks == null) allBooks = List.of();
+if (newBooks.isEmpty() && allBooks.isEmpty()) {
+  StoreDAO dao = StoreDAO.get();
+  List<Book> dbBooks = new ArrayList<>(dao.books());
+  dbBooks.sort(Comparator.comparingInt(Book::getId).reversed());
+  newBooks = dbBooks.stream().limit(10).toList();
+  topBooks = dao.top10();
+  categories = dao.categories();
+  allBooks = dbBooks;
+}
+%>
 
-  .bok-slider-track:hover {
-    animation-play-state: paused; /* Tạm dừng hiệu ứng khi rê chuột vào */
-  }
-
-  .bok-slide-card {
-    width: 280px;
-    margin: 0 20px;
-    flex-shrink: 0;
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .bok-slide-card img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-bottom: 12px;
-  }
-
-  .bok-slide-card h3 {
-    font-size: 1rem;
-    margin: 8px 0;
-    color: #1a1a1a;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .bok-slide-card .price {
-    color: #d97706;
-    font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 12px;
-  }
-
-  @keyframes scrollLeft {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(calc(-320px * 8)); /* Dịch chuyển qua trái 8 sản phẩm */
-    }
-  }
-</style>
-
-<div class="bok-slider-wrapper">
-  <div class="bok-slider-track">
-    <!-- Danh sách sản phẩm từ Database (Lần 1) -->
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/2b2d42/ffffff?text=Java+Spring" alt="Giáo Trình Lập Trình Java Spring Boot" />
-      <h3>Giáo Trình Lập Trình Java Spring Boot</h3>
-      <p class="price">150.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=1">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/1d3557/ffffff?text=Data+Structures" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
-      <h3>Cấu Trúc Dữ Liệu Và Giải Thuật</h3>
-      <p class="price">120.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=2">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/457b9d/ffffff?text=Conan+100" alt="Thám Tử Lừng Danh Conan - Tập 100" />
-      <h3>Thám Tử Lừng Danh Conan - Tập 100</h3>
-      <p class="price">30.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=3">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e63946/ffffff?text=One+Piece+101" alt="One Piece - Tập 101" />
-      <h3>One Piece - Tập 101</h3>
-      <p class="price">35.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=4">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim" alt="Nhà Giả Kim" />
-      <h3>Nhà Giả Kim</h3>
-      <p class="price">79.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=5">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e9c46a/ffffff?text=Mat+Biec" alt="Mắt Biếc" />
-      <h3>Mắt Biếc</h3>
-      <p class="price">110.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=6">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam" alt="Đắc Nhân Tâm" />
-      <h3>Đắc Nhân Tâm</h3>
-      <p class="price">86.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=7">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e76f51/ffffff?text=Atomic+Habits" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
-      <h3>Thay Đổi Tí Hon Hiệu Quả Bất Ngờ</h3>
-      <p class="price">145.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=8">Xem chi tiết</a>
-    </div>
-
-    <!-- Duplicate dữ liệu để vòng lặp hiệu ứng trượt mượt mà -->
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/2b2d42/ffffff?text=Java+Spring" alt="Giáo Trình Lập Trình Java Spring Boot" />
-      <h3>Giáo Trình Lập Trình Java Spring Boot</h3>
-      <p class="price">150.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=1">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/1d3557/ffffff?text=Data+Structures" alt="Cấu Trúc Dữ Liệu Và Giải Thuật" />
-      <h3>Cấu Trúc Dữ Liệu Và Giải Thuật</h3>
-      <p class="price">120.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=2">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/457b9d/ffffff?text=Conan+100" alt="Thám Tử Lừng Danh Conan - Tập 100" />
-      <h3>Thám Tử Lừng Danh Conan - Tập 100</h3>
-      <p class="price">30.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=3">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e63946/ffffff?text=One+Piece+101" alt="One Piece - Tập 101" />
-      <h3>One Piece - Tập 101</h3>
-      <p class="price">35.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=4">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim" alt="Nhà Giả Kim" />
-      <h3>Nhà Giả Kim</h3>
-      <p class="price">79.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=5">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e9c46a/ffffff?text=Mat+Biec" alt="Mắt Biếc" />
-      <h3>Mắt Biếc</h3>
-      <p class="price">110.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=6">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam" alt="Đắc Nhân Tâm" />
-      <h3>Đắc Nhân Tâm</h3>
-      <p class="price">86.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=7">Xem chi tiết</a>
-    </div>
-    <div class="bok-slide-card">
-      <img src="https://placehold.co/400x600/e76f51/ffffff?text=Atomic+Habits" alt="Thay Đổi Tí Hon Hiệu Quả Bất Ngờ" />
-      <h3>Thay Đổi Tí Hon Hiệu Quả Bất Ngờ</h3>
-      <p class="price">145.000 VNĐ</p>
-      <a class="bok-btn" href="${pageContext.request.contextPath}/book?id=8">Xem chi tiết</a>
-    </div>
-  </div>
-</div>
-<!-- ================= KẾT THÚC PHẦN THÊM MỚI ================= -->
-
-<!-- CODE CŨ DƯỚI ĐÂY GIỮ NGUYÊN 100% -->
-<section class="hero">
+<section class="mot-home-hero">
   <div class="container">
-    <p class="eyebrow">
-      NHÀ SÁCH TRỰC TUYẾN
-    </p>
-    <h1>
-      Mở một cuốn sách, mở cả thế giới
-    </h1>
-    <p>
-      Khám phá sách mới, sách bán chạy và đặt hàng nhanh chóng tại BokStore.
-    </p>
-    <a class="bok-btn" href="${pageContext.request.contextPath}/shop">
-      Khám phá ngay
-    </a>
+    <div class="mot-hero-copy">
+      <span>&#272;&#7890;NG H&Agrave;NH T&Igrave;M TRI TH&#7912;C</span>
+      <h1>M&#7885;t s&aacute;ch ch&#7885;n l&#7885;c cho ng&#432;&#7901;i &#273;&#7885;c k&#7929; t&iacute;nh</h1>
+      <p>T&igrave;m s&aacute;ch m&#7899;i, xem s&aacute;ch b&aacute;n ch&#7841;y v&agrave; &#273;&#7863;t h&agrave;ng nhanh t&#7915; kho s&aacute;ch BokStore.</p>
+      <form class="mot-hero-search" action="<%=request.getContextPath()%>/shop" method="get">
+        <input name="q" placeholder="T&igrave;m ki&#7871;m t&ecirc;n s&aacute;ch ho&#7863;c t&aacute;c gi&#7843;">
+        <button>T&igrave;m ki&#7871;m</button>
+      </form>
+    </div>
   </div>
 </section>
-<section class="container content-section">
-  <h2>
-    Mua sách dễ dàng
-  </h2>
-  <div class="feature-grid">
-    <article>
-      <h3>
-        Tìm kiếm thông minh
-      </h3>
-      <p>
-        Lọc nhanh sách theo từ khóa, danh mục và tồn kho.
-      </p>
-    </article>
-    <article>
-      <h3>
-        Đặt hàng nhanh
-      </h3>
-      <p>
-        Tự động tính tổng tiền và kiểm tra số lượng.
-      </p>
-    </article>
-    <article>
-      <h3>
-        Theo dõi thuận tiện
-      </h3>
-      <p>
-        Xem lịch sử và trạng thái giao hàng.
-      </p>
-    </article>
+
+<section class="mot-container">
+  <div class="mot-section-head">
+    <h2>S&aacute;ch m&#7899;i ph&aacute;t h&agrave;nh</h2>
+    <a href="<%=request.getContextPath()%>/shop?shelf=new">Xem t&#7845;t c&#7843;</a>
+  </div>
+  <div class="mot-grid-5">
+    <% for (Book book : newBooks) { String img = imageSrc(request, book); %>
+      <article class="mot-card">
+        <a class="mot-img-box" href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
+          <% if (!img.isEmpty()) { %>
+            <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+          <% } else { %>
+            <span class="mot-cover-fallback"><%=book.getName().substring(0, 1)%></span>
+          <% } %>
+        </a>
+        <h3 class="mot-book-title"><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h3>
+        <p class="mot-author"><%=book.getAuthor()%></p>
+        <div class="mot-price-box">
+          <strong class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</strong>
+        </div>
+        <form method="post" action="<%=request.getContextPath()%>/cart">
+          <input type="hidden" name="id" value="<%=book.getId()%>">
+          <button class="mot-buy-btn" <%=book.getStock() == 0 ? "disabled" : ""%>>Th&ecirc;m v&agrave;o gi&#7887;</button>
+        </form>
+      </article>
+    <% } %>
+  </div>
+  <% if (newBooks.isEmpty()) { %>
+    <p class="empty-state">Ch&#432;a c&oacute; s&aacute;ch trong database.</p>
+  <% } %>
+
+  <div class="mot-dual-section">
+    <aside class="mot-panel">
+      <div class="mot-section-head compact">
+        <h2>C&aacute;c s&aacute;ch b&aacute;n ch&#7841;y nh&#7845;t</h2>
+      </div>
+      <% for (Book book : topBooks.stream().limit(6).toList()) { String img = imageSrc(request, book); %>
+        <article class="bestseller-item">
+          <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
+            <% if (!img.isEmpty()) { %>
+              <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+            <% } else { %>
+              <span class="mini-cover"><%=book.getName().substring(0, 1)%></span>
+            <% } %>
+          </a>
+          <div class="bestseller-info">
+            <h4><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h4>
+            <span class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</span>
+          </div>
+        </article>
+      <% } %>
+    </aside>
+
+    <section class="mot-panel">
+      <div class="mot-category-header">
+        <h2>S&aacute;ch theo t&#7915;ng th&#7875; lo&#7841;i</h2>
+        <ul class="mot-tabs">
+          <% for (int i = 0; i < Math.min(3, categories.size()); i++) { Category category = categories.get(i); %>
+            <li class="<%=i == 0 ? "active" : ""%>"><a href="<%=request.getContextPath()%>/shop?category=<%=category.getId()%>"><%=category.getName()%></a></li>
+          <% } %>
+        </ul>
+      </div>
+      <div class="mot-grid-2">
+        <%
+        List<Book> categoryBooks = categories.isEmpty() ? allBooks.stream().limit(8).toList() : byCategory(allBooks, categories.get(0).getId(), 8);
+        for (Book book : categoryBooks) { String img = imageSrc(request, book);
+        %>
+          <article class="mot-card horizontal-card">
+            <div class="card-inner">
+              <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
+                <% if (!img.isEmpty()) { %>
+                  <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+                <% } else { %>
+                  <span class="mot-cover-fallback small"><%=book.getName().substring(0, 1)%></span>
+                <% } %>
+              </a>
+              <div class="horizontal-info">
+                <h4><a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>"><%=book.getName()%></a></h4>
+                <p class="mot-author"><%=book.getAuthor()%></p>
+                <strong class="price-new"><%=String.format("%,d", book.getPrice())%>&#8363;</strong>
+                <p class="desc"><%=book.getDescription()%></p>
+              </div>
+            </div>
+          </article>
+        <% } %>
+      </div>
+    </section>
   </div>
 </section>

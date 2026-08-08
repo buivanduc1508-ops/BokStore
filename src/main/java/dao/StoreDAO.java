@@ -21,83 +21,19 @@ public final class StoreDAO {
       userSeq = new AtomicInteger(), orderSeq = new AtomicInteger(), reviewSeq = new AtomicInteger();
 
   private StoreDAO() {
-    if (database.load(categories, books, users, orders, reviews, favorites, avatars)) {
-      resetSequences();
-      return;
-    }
-    categories.add(new Category(1, "Văn học"));
-    categories.add(new Category(2, "Kỹ năng"));
-    categories.add(new Category(3, "Công nghệ"));
-    books.add(
-        new Book(
-            1,
-            "Nhà giả kim",
-            "Paulo Coelho",
-            "Nhã Nam",
-            79000,
-            "https://placehold.co/400x600/2a9d8f/ffffff?text=Nha+Gia+Kim",
-            "Hành trình theo đuổi ước mơ.",
-            1,
-            20));
-    books.add(
-        new Book(
-            2,
-            "Đắc nhân tâm",
-            "Dale Carnegie",
-            "Tổng hợp",
-            86000,
-            "https://placehold.co/400x600/f4a261/ffffff?text=Dac+Nhan+Tam",
-            "Nghệ thuật giao tiếp và ứng xử.",
-            2,
-            16));
-    books.add(
-        new Book(
-            3,
-            "Clean Code",
-            "Robert C. Martin",
-            "Pearson",
-            245000,
-            "https://placehold.co/400x600/2b2d42/ffffff?text=Clean+Code",
-            "Cẩm nang viết mã nguồn sạch.",
-            3,
-            8));
-    books.add(
-        new Book(
-            4,
-            "Tuổi trẻ đáng giá bao nhiêu",
-            "Rosie Nguyễn",
-            "Hội Nhà Văn",
-            90000,
-            "https://placehold.co/400x600/e76f51/ffffff?text=Tuoi+Tre",
-            "Sách truyền cảm hứng cho người trẻ.",
-            2,
-            12));
-    books.add(
-        new Book(
-            5,
-            "Dế Mèn phiêu lưu ký",
-            "Tô Hoài",
-            "Kim Đồng",
-            65000,
-            "https://placehold.co/400x600/e9c46a/ffffff?text=De+Men",
-            "Tác phẩm văn học thiếu nhi kinh điển.",
-            1,
-            25));
-    books.add(
-        new Book(
-            6,
-            "Java Core",
-            "Cay Horstmann",
-            "Pearson",
-            320000,
-            "https://placehold.co/400x600/1d3557/ffffff?text=Java+Core",
-            "Nền tảng lập trình Java.",
-            3,
-            5));
+    boolean loaded = database.load(categories, books, users, orders, reviews, favorites, avatars);
+    boolean catalogChanged = database.mergeSqlCatalog(categories, books);
+    ensureDefaultUsers();
+    resetSequences();
+    if (!loaded || catalogChanged) persist();
+  }
+
+  private void ensureDefaultUsers() {
+    if (!users.isEmpty()) return;
     users.add(
         new User(
             1,
-            "Quản trị viên",
+            "Quan tri vien",
             "admin@bokstore.vn",
             "BokStore",
             "0900000000",
@@ -107,17 +43,14 @@ public final class StoreDAO {
     users.add(
         new User(
             2,
-            "Khách hàng mẫu",
+            "Khach hang mau",
             "user@bokstore.vn",
-            "TP. Hồ Chí Minh",
+            "TP. Ho Chi Minh",
             "0911111111",
             "user",
             PasswordUtils.hash("user123"),
             "USER"));
-    resetSequences();
-    persist();
   }
-
   private void resetSequences() {
     categorySeq.set(categories.stream().mapToInt(Category::getId).max().orElse(0) + 1);
     bookSeq.set(books.stream().mapToInt(Book::getId).max().orElse(0) + 1);
@@ -186,15 +119,13 @@ public final class StoreDAO {
             b ->
                 q == null
                     || q.isBlank()
-                    || ((b.getName() == null ? "" : b.getName()) + " " + (b.getAuthor() == null ? "" : b.getAuthor()))
-                        .toLowerCase()
-                        .contains(q.toLowerCase()))
+                    || (b.getName() + " " + b.getAuthor()).toLowerCase().contains(q.toLowerCase()))
         .filter(b -> category == 0 || b.getCategoryId() == category)
         .filter(
             b ->
                 publisher == null
                     || publisher.isBlank()
-                    || (b.getPublisher() != null && b.getPublisher().equalsIgnoreCase(publisher)))
+                    || b.getPublisher().equalsIgnoreCase(publisher))
         .filter(
             b ->
                 availability == null
@@ -221,12 +152,6 @@ public final class StoreDAO {
       String description,
       int category,
       int stock) {
-    if (image == null || image.isBlank()) {
-      image = "https://placehold.co/400x600/2b2d42/ffffff?text=" + (name == null || name.isBlank() ? "Book" : name.replaceAll("\\s+", "+"));
-    }
-    if (category <= 0 && !categories.isEmpty()) {
-      category = categories.get(0).getId();
-    }
     Book b = book(id);
     if (b == null) {
       b =
@@ -523,3 +448,4 @@ public final class StoreDAO {
     return reviews(bookId).stream().mapToInt(Review::getRating).average().orElse(0);
   }
 }
+

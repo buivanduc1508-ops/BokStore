@@ -8,7 +8,245 @@ body.client-layout {
   z-index: 40;
   background: #fff;
   border-bottom: 1px solid #e5e5e5;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Be Vietnam Pro", Arial, sans-serif;
+}
+
+.mot-home-hero {
+  background: #f6f2ec;
+  border-bottom: 1px solid #ece6dd;
+}
+
+.mot-home-hero .container {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  background:
+    linear-gradient(90deg, rgba(246, 242, 236, .98), rgba(246, 242, 236, .86) 48%, rgba(246, 242, 236, .24)),
+    url("../images/bg/4853433.jpg") center right / cover no-repeat;
+}
+
+.mot-hero-copy {
+  max-width: 560px;
+  padding: 38px 0;
+}
+
+.mot-hero-copy span {
+  color: #d71920;
+  font: 800 12px Arial, sans-serif;
+  letter-spacing: 1.4px;
+}
+
+.mot-hero-copy h1 {
+  margin: 8px 0 10px;
+  color: #1f1f1f;
+  font: 700 34px/1.25 "Be Vietnam Pro", Arial, sans-serif;
+}
+
+.mot-hero-copy p {
+  margin: 0 0 18px;
+  color: #555;
+  font-size: 15px;
+}
+
+.mot-hero-search {
+  width: min(100%, 520px);
+  display: grid;
+  grid-template-columns: 1fr 112px;
+  border: 2px solid #d71920;
+  background: #fff;
+}
+
+.mot-hero-search input,
+.mot-hero-search button {
+  height: 44px;
+  border: 0;
+  border-radius: 0;
+}
+
+.mot-hero-search input {
+  padding: 0 14px;
+}
+
+.mot-hero-search button,
+.mot-buy-btn {
+  background: #d71920;
+  color: #fff;
+  font-weight: 700;
+}
+
+.mot-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 18px;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.mot-section-head h2,
+.mot-category-header h2 {
+  margin: 0;
+  padding: 0 0 11px;
+  color: #222;
+  font: 800 20px/1.2 Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.mot-section-head h2 {
+  border-bottom: 3px solid #d71920;
+}
+
+.mot-section-head a {
+  color: #d71920;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mot-panel {
+  background: #fff;
+}
+
+.mot-card {
+  border-radius: 3px;
+}
+
+.mot-card form {
+  margin-top: 10px;
+}
+
+.mot-buy-btn {
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.mot-buy-btn:hover {
+  transform: none;
+  background: #b9131b;
+}
+
+.mot-cover-fallback,
+.mini-cover {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #44515d, #c94b52);
+  color: #fff;
+  font: 800 52px Georgia, serif;
+}
+
+.mot-cover-fallback.small,
+.mini-cover {
+  width: 80px;
+  height: 110px;
+  font-size: 34px;
+}
+
+.mini-cover {
+  width: 50px;
+  height: 70px;
+  border-radius: 3px;
+}
+
+.horizontal-info h4 a,
+.bestseller-info h4 a {
+  color: #333;
+  text-decoration: none;
+}
+
+.horizontal-info h4 a:hover,
+.bestseller-info h4 a:hover,
+.mot-book-title a:hover {
+  color: #d71920;
+}
+
+@media (max-width: 1100px) {
+  .mot-grid-5 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .mot-grid-5,
+  .mot-grid-2,
+  .mot-dual-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mot-dual-section {
+    display: grid;
+  }
+}
+
+@media (max-width: 560px) {
+  .mot-home-hero .container {
+    min-height: 230px;
+    background: #f6f2ec;
+  }
+
+  .mot-hero-copy h1 {
+    font-size: 25px;
+  }
+
+  .mot-hero-search {
+    grid-template-columns: 1fr;
+  }
+
+  .mot-grid-5,
+  .mot-grid-2,
+  .mot-dual-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mot-contact-strip {
+  background: #f7f7f7;
+  border-bottom: 1px solid #ececec;
+  color: #555;
+  font: 600 12px Arial, sans-serif;
+}
+
+.mot-contact-strip .container {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.mot-contact-strip span:first-child {
+  color: #d71920;
+  font-weight: 800;
+}
+
+.mot-container .mot-card {
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+.mot-container .mot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .08);
+}
+
+.mot-container .mot-book-title {
+  font-family: Arial, sans-serif;
+  min-height: 38px;
+}
+
+.mot-container .price-new {
+  color: #d71920;
+}
+
+.mot-container .mot-img-box {
+  height: 188px;
+  border: 1px solid #f1f1f1;
+  background: #fafafa;
+}
+
+.mot-container .mot-img-box img {
+  padding: 4px;
 }
 
 .mot-topbar {
@@ -226,7 +464,9 @@ body.client-layout {
   border-bottom: 1px solid #e5e5e5;
   color: #222;
   text-decoration: none;
+  font-family: "Be Vietnam Pro", Arial, sans-serif;
   font-size: 17px;
+  letter-spacing: 0;
 }
 
 .mot-category-box a:first-of-type {
@@ -253,7 +493,7 @@ body.client-layout {
 .mot-main-nav a {
   color: #333;
   text-decoration: none;
-  font: 700 13px Arial, sans-serif;
+  font: 700 13px "Be Vietnam Pro", Arial, sans-serif;
   letter-spacing: .2px;
 }
 

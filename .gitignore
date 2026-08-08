@@ -10,7 +10,7 @@
 *.zip
 *.tar.gz
 *.rar
-!src/main/webapp/WEB-INF/lib/h2-*.jar
+!src/main/webapp/WEB-INF/lib/mssql-jdbc-*.jar
 
 # ==========================================
 # 2. Build Tools (Thư mục đầu ra của Maven & Gradle)

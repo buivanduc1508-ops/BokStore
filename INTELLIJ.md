@@ -3,8 +3,8 @@
 ## IntelliJ IDEA Ultimate + Tomcat
 
 1. Open the project folder in IntelliJ IDEA.
-2. When IntelliJ detects `pom.xml`, choose to import/reload it as a Maven project.
-3. Go to `File > Project Structure > Project` and select JDK 17 or newer. Set the language level to 17.
+2. When IntelliJ detects `pom.xml`, import or reload it as a Maven project.
+3. Go to `File > Project Structure > Project` and select JDK 17 or newer.
 4. Go to `File > Project Structure > Artifacts`.
 5. Add `Web Application: Exploded > From Modules`, then select module `BokStore`.
 6. Go to `Run > Edit Configurations > + > Tomcat Server > Local`.
@@ -15,30 +15,22 @@
 
 ## IntelliJ IDEA Community or Terminal Run
 
-IntelliJ IDEA Community does not include the built-in Tomcat run configuration. Use the bundled runtime script from IntelliJ Terminal:
+Use the bundled runtime script from IntelliJ Terminal:
 
 ```bat
 run-intellij-runtime.bat
 ```
 
-The script automatically detects the JDK from `JAVA_HOME` or `PATH`, compiles Java files into `target/intellij-runtime`, deploys the application into `.runtime/apache-tomcat-10.1.54/webapps/BokStore`, and starts Tomcat.
-
-## Maven Build
-
-You can build the WAR from IntelliJ's Maven tool window or terminal:
-
-```bat
-mvn clean package
-```
-
-The output file is:
-
-```text
-target/BokStore.war
-```
+The script compiles Java files into `target/intellij-runtime`, deploys the application into `.runtime/apache-tomcat-10.1.54/webapps/BokStore`, and starts Tomcat.
 
 ## Database
 
-No external database server is required. BokStore uses an embedded H2 file database and creates it automatically under Tomcat's `data` directory. To reset all learning data, stop Tomcat and delete `data/bokstore.mv.db`; the sample data will be recreated on the next start.
+BokStore uses SQL Server on the local machine:
 
-An optional `DB_URL` environment variable can point H2 to another file location.
+```text
+Database: BOOKSTORE
+User: sa
+URL: jdbc:sqlserver://localhost:1433;databaseName=BOOKSTORE;encrypt=true;trustServerCertificate=true
+```
+
+Set `DB_PASSWORD` locally before starting Tomcat if your SQL Server account requires a password. Create/import the schema and data in SQL Server before starting Tomcat. The main catalog is read from `dbo.danh_muc` and `dbo.san_pham`.
