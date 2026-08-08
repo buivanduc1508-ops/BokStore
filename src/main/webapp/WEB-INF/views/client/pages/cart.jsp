@@ -111,7 +111,6 @@
 
   <%if(!cart.isEmpty()){%>
   <%
-  <%
     jakarta.servlet.http.HttpSession sess = request.getSession(false);
     User u = (sess != null) ? (User) sess.getAttribute("user") : null;
     String customerName = (u != null && u.getName() != null) ? u.getName() : "";

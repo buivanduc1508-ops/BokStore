@@ -3,6 +3,8 @@
 <%!
 private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
   String image = book == null || book.getImage() == null ? "" : book.getImage().trim();
+  if (image.startsWith("//")) image = "https:" + image;
+  if (image.toLowerCase(java.util.Locale.ROOT).startsWith("www.")) image = "https://" + image;
   if (image.isEmpty()
       || image.startsWith("http://")
       || image.startsWith("https://")
@@ -11,6 +13,11 @@ private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book bo
     return image;
   }
   return request.getContextPath() + "/" + image;
+}
+
+private String attr(String value) {
+  if (value == null) return "";
+  return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 }
 
 private List<Book> byCategory(List<Book> books, int categoryId, int limit) {
@@ -66,7 +73,7 @@ if (newBooks.isEmpty() && allBooks.isEmpty()) {
       <article class="mot-card">
         <a class="mot-img-box" href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
           <% if (!img.isEmpty()) { %>
-            <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+            <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
           <% } else { %>
             <span class="mot-cover-fallback"><%=book.getName().substring(0, 1)%></span>
           <% } %>
@@ -96,7 +103,7 @@ if (newBooks.isEmpty() && allBooks.isEmpty()) {
         <article class="bestseller-item">
           <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
             <% if (!img.isEmpty()) { %>
-              <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+              <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
             <% } else { %>
               <span class="mini-cover"><%=book.getName().substring(0, 1)%></span>
             <% } %>
@@ -127,7 +134,7 @@ if (newBooks.isEmpty() && allBooks.isEmpty()) {
             <div class="card-inner">
               <a href="<%=request.getContextPath()%>/book?id=<%=book.getId()%>">
                 <% if (!img.isEmpty()) { %>
-                  <img src="<%=img%>" alt="<%=book.getName()%>" loading="lazy">
+                  <img src="<%=attr(img)%>" alt="<%=attr(book.getName())%>" loading="lazy">
                 <% } else { %>
                   <span class="mot-cover-fallback small"><%=book.getName().substring(0, 1)%></span>
                 <% } %>

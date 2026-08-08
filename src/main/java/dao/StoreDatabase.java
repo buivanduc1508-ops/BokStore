@@ -33,9 +33,18 @@ final class StoreDatabase {
     try (Connection connection = ConnectDB.getConnect();
         Statement statement = connection.createStatement()) {
       statement.execute(sql);
+      widenImageColumnIfPresent(statement);
     } catch (Exception e) {
       throw new IllegalStateException("Khong the khoi tao database SQL Server", e);
     }
+  }
+
+  private void widenImageColumnIfPresent(Statement statement) throws Exception {
+    statement.execute(
+        "IF OBJECT_ID('dbo.san_pham', 'U') IS NOT NULL "
+        + "AND COL_LENGTH('dbo.san_pham', 'image') IS NOT NULL "
+        + "AND COL_LENGTH('dbo.san_pham', 'image') < 2000 "
+        + "ALTER TABLE dbo.san_pham ALTER COLUMN image NVARCHAR(1000) NULL");
   }
 
   @SuppressWarnings("unchecked")
@@ -102,7 +111,7 @@ final class StoreDatabase {
                   "Dang cap nhat",
                   "BokStore",
                   result.getBigDecimal("price").longValue(),
-                  safe(result.getString("image")),
+                  normalizeImage(safe(result.getString("image"))),
                   safe(result.getString("description")),
                   result.getInt("category_id"),
                   result.getInt("quantity"));
@@ -278,6 +287,28 @@ final class StoreDatabase {
 
   private String safe(String value) {
     return value == null ? "" : value;
+  }
+
+  private String normalizeImage(String value) {
+    String image = value == null ? "" : value.trim();
+    if (image.startsWith("//")) return "https:" + image;
+    if (image.toLowerCase(java.util.Locale.ROOT).startsWith("www.")) return "https://" + image;
+
+    String drivePrefix = "https://drive.google.com/file/d/";
+    if (image.startsWith(drivePrefix)) {
+      int start = drivePrefix.length();
+      int end = image.indexOf('/', start);
+      if (end > start) return "https://drive.google.com/thumbnail?id=" + image.substring(start, end) + "&sz=w800";
+    }
+
+    String driveOpen = "https://drive.google.com/open?id=";
+    if (image.startsWith(driveOpen)) {
+      String id = image.substring(driveOpen.length());
+      int amp = id.indexOf('&');
+      if (amp > 0) id = id.substring(0, amp);
+      if (!id.isBlank()) return "https://drive.google.com/thumbnail?id=" + id + "&sz=w800";
+    }
+    return image;
   }
 
   private static final class Snapshot implements Serializable {

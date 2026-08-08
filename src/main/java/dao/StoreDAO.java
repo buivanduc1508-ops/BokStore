@@ -152,6 +152,7 @@ public final class StoreDAO {
       String description,
       int category,
       int stock) {
+    image = normalizeImage(image, name);
     Book b = book(id);
     if (b == null) {
       b =
@@ -178,6 +179,34 @@ public final class StoreDAO {
     }
     persist();
     return b;
+  }
+
+  private String normalizeImage(String image, String name) {
+    String value = image == null ? "" : image.trim();
+    if (value.isBlank()) {
+      return "https://placehold.co/400x600/2b2d42/ffffff?text="
+          + (name == null || name.isBlank() ? "Book" : name.trim().replaceAll("\\s+", "+"));
+    }
+    if (value.startsWith("//")) return "https:" + value;
+    if (value.toLowerCase(Locale.ROOT).startsWith("www.")) return "https://" + value;
+
+    String drivePrefix = "https://drive.google.com/file/d/";
+    if (value.startsWith(drivePrefix)) {
+      int start = drivePrefix.length();
+      int end = value.indexOf('/', start);
+      if (end > start) {
+        return "https://drive.google.com/thumbnail?id=" + value.substring(start, end) + "&sz=w800";
+      }
+    }
+
+    String driveOpen = "https://drive.google.com/open?id=";
+    if (value.startsWith(driveOpen)) {
+      String driveId = value.substring(driveOpen.length());
+      int amp = driveId.indexOf('&');
+      if (amp > 0) driveId = driveId.substring(0, amp);
+      if (!driveId.isBlank()) return "https://drive.google.com/thumbnail?id=" + driveId + "&sz=w800";
+    }
+    return value;
   }
 
   public void deleteBook(int id) {

@@ -140,6 +140,12 @@ public class StoreServlet extends HttpServlet {
       case "/contact":
         client(req, resp, "Liên hệ", "contact", "/WEB-INF/views/client/pages/contact.jsp");
         break;
+      case "/login":
+        client(req, resp, "Dang nhap", "login", "/WEB-INF/views/client/pages/auth.jsp");
+        break;
+      case "/register":
+        client(req, resp, "Dang ky", "register", "/WEB-INF/views/client/pages/register.jsp");
+        break;
       case "/admin/manage":
         admin(req, resp);
         break;

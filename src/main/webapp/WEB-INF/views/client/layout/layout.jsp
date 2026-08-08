@@ -74,6 +74,7 @@
               </div>
               <p class="avatar-status" role="status" hidden></p>
               <a href="<c:url value='/profile' />">Th&ocirc;ng tin t&agrave;i kho&#7843;n</a>
+              <a href="<c:url value='/orders' />">L&#7883;ch s&#7917; mua h&agrave;ng</a>
               <a href="<c:url value='/wishlist' />">Y&ecirc;u th&iacute;ch</a>
               <a class="account-logout" href="<c:url value='/logout' />">&#272;&#259;ng xu&#7845;t</a>
             </div>

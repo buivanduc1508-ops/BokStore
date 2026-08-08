@@ -3,6 +3,8 @@
 <%!
 private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
   String image = book == null || book.getImage() == null ? "" : book.getImage().trim();
+  if (image.startsWith("//")) image = "https:" + image;
+  if (image.toLowerCase(java.util.Locale.ROOT).startsWith("www.")) image = "https://" + image;
   if (image.isEmpty()
       || image.startsWith("http://")
       || image.startsWith("https://")
@@ -11,6 +13,11 @@ private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book bo
     return image;
   }
   return request.getContextPath() + "/" + image;
+}
+
+private String attr(String value) {
+  if (value == null) return "";
+  return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 }
 %>
 <%
@@ -81,7 +88,7 @@ if (!sortParam.isBlank()) pageQuery += "&sort=" + java.net.URLEncoder.encode(sor
         <a class="cover-link" href="<%=request.getContextPath()%>/book?id=<%=b.getId()%>">
           <div class="book-cover cover-<%=(color % 4) + 1%> <%=img.isEmpty() ? "" : "has-image"%>">
             <% if (!img.isEmpty()) { %>
-              <img class="book-cover-img" src="<%=img%>" alt="<%=b.getName()%>" loading="lazy">
+              <img class="book-cover-img" src="<%=attr(img)%>" alt="<%=attr(b.getName())%>" loading="lazy">
             <% } %>
             <span class="cover-brand">BOKSTORE</span>
             <strong><%=b.getName().substring(0, 1)%></strong>

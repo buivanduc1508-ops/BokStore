@@ -3,14 +3,21 @@
 <%!
 private String imageSrc(jakarta.servlet.http.HttpServletRequest request, Book book) {
   String image = book == null || book.getImage() == null ? "" : book.getImage().trim();
+  if (image.startsWith("//")) image = "https:" + image;
+  if (image.toLowerCase(java.util.Locale.ROOT).startsWith("www.")) image = "https://" + image;
   if (image.isEmpty()
-      || image.startsWith("https://")
+      || image.startsWith("http://")
       || image.startsWith("https://")
       || image.startsWith("/")
       || image.startsWith("data:")) {
     return image;
   }
   return request.getContextPath() + "/" + image;
+}
+
+private String attr(String value) {
+  if (value == null) return "";
+  return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 }
 %>
 <%
@@ -27,7 +34,7 @@ double rating = (Double) request.getAttribute("rating");
     <div class="detail-grid" style="margin-top:24px">
       <div class="book-cover cover-2 large <%=img.isEmpty() ? "" : "has-image"%>">
         <% if (!img.isEmpty()) { %>
-          <img class="book-cover-img" src="<%=img%>" alt="<%=b.getName()%>">
+          <img class="book-cover-img" src="<%=attr(img)%>" alt="<%=attr(b.getName())%>">
         <% } %>
         <span class="cover-brand">BOKSTORE</span>
         <strong><%=b.getName().substring(0, 1)%></strong>
@@ -99,7 +106,7 @@ double rating = (Double) request.getAttribute("rating");
             <a class="cover-link" href="<%=request.getContextPath()%>/book?id=<%=rb.getId()%>">
               <div class="book-cover cover-3 <%=rbImg.isEmpty() ? "" : "has-image"%>">
                 <% if (!rbImg.isEmpty()) { %>
-                  <img class="book-cover-img" src="<%=rbImg%>" alt="<%=rb.getName()%>" loading="lazy">
+                  <img class="book-cover-img" src="<%=attr(rbImg)%>" alt="<%=attr(rb.getName())%>" loading="lazy">
                 <% } %>
                 <strong><%=rb.getName().substring(0, 1)%></strong>
               </div>

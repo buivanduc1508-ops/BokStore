@@ -1,5 +1,11 @@
 <%@ page import="java.util.*,model.*" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%!
+private String attr(String value) {
+  if (value == null) return "";
+  return value.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
+}
+%>
 <%Book b=(Book)request.getAttribute("book");List<Category> cats=(List<Category>)request.getAttribute("categories");%>
 <div class="bok-admin">
   <header>
@@ -53,7 +59,8 @@
       </label>
       <label>
         Đường dẫn ảnh
-        <input name="image" placeholder="https://placehold.co/400x600/..." value="<%=b==null?"":b.getImage()%>">
+        <input name="image" placeholder="https://example.com/book.jpg" value="<%=b==null?"":attr(b.getImage())%>">
+        <small>D&aacute;n link tr&#7921;c ti&#7871;p t&#7899;i file &#7843;nh. H&#7895; tr&#7907; https://, www. v&agrave; Google Drive.</small>
       </label>
       <label>
         Mô tả
